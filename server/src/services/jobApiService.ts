@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { stripHtml, truncate } from '../utils/htmlCleaner'
 
 export interface JobResult {
   title: string
@@ -99,10 +100,13 @@ export class JobApiService {
 
     try {
       // Fetch from multiple sources in parallel
-      const [remotive, adzuna, themuse] = await Promise.allSettled([
+      const [remotive, adzuna, themuse, arbeitnow, jsearch, landing] = await Promise.allSettled([
         this.fetchRemotive(query),
         this.fetchAdzuna(query, location),
-        this.fetchTheMuse(query, location)
+        this.fetchTheMuse(query, location),
+        this.fetchArbeitnow(query, location),
+        this.fetchJSearch(query, location),
+        this.fetchLandingJobs(query)
       ])
 
       if (remotive.status === 'fulfilled') {
@@ -114,8 +118,17 @@ export class JobApiService {
       if (themuse.status === 'fulfilled') {
         results.push(...themuse.value)
       }
+      if (arbeitnow.status === 'fulfilled') {
+        results.push(...arbeitnow.value)
+      }
+      if (jsearch.status === 'fulfilled') {
+        results.push(...jsearch.value)
+      }
+      if (landing.status === 'fulfilled') {
+        results.push(...landing.value)
+      }
 
-      console.log(`Found ${results.length} jobs from APIs`)
+      console.log(`Found ${results.length} jobs from ${[remotive, adzuna, themuse, arbeitnow, jsearch, landing].filter(r => r.status === 'fulfilled').length} sources`)
       return results
 
     } catch (error) {
@@ -141,7 +154,7 @@ export class JobApiService {
         location: 'Remote',
         salary: job.salary || 'Not specified',
         type: job.job_type || 'Full-time',
-        description: job.description?.substring(0, 500) || 'No description',
+        description: truncate(stripHtml(job.description || 'No description'), 300),
         url: job.url,
         source: 'Remotive',
         postedDate: job.publication_date
@@ -186,9 +199,9 @@ export class JobApiService {
         title: job.title,
         company: job.company.display_name,
         location: job.location.display_name,
-        salary: job.salary_min ? `$${job.salary_min} - $${job.salary_max}` : 'Not specified',
+        salary: job.salary_min ? `$${Math.round(job.salary_min)} - $${Math.round(job.salary_max)}` : 'Not specified',
         type: job.contract_time || 'Full-time',
-        description: job.description?.substring(0, 500) || 'No description',
+        description: truncate(stripHtml(job.description || 'No description'), 300),
         url: job.redirect_url,
         source: 'Adzuna',
         postedDate: job.created
@@ -204,30 +217,169 @@ export class JobApiService {
    */
   private async fetchTheMuse(query: string, location: string): Promise<JobResult[]> {
     try {
+      // The Muse API - simplified request to avoid 403
       const response = await axios.get('https://www.themuse.com/api/public/jobs', {
         params: {
-          keyword: query,
-          location: location,
-          page: 0,
-          descending: true
+          page: 0
         },
-        timeout: 10000
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json',
+          'Referer': 'https://www.themuse.com/'
+        }
       })
 
       const jobs = response.data.results || []
-      return jobs.slice(0, 20).map((job: any) => ({
-        title: job.name,
-        company: job.company?.name || 'Unknown',
-        location: job.locations?.[0]?.name || location,
-        salary: 'Not specified',
-        type: job.type || 'Full-time',
-        description: job.contents?.substring(0, 500) || 'No description',
-        url: `https://www.themuse.com/jobs/${job.id}`,
-        source: 'The Muse',
-        postedDate: job.publication_date
-      }))
+      
+      // Filter by query locally since API might not support all params
+      const filteredJobs = query 
+        ? jobs.filter((job: any) => {
+            const titleMatch = job.name?.toLowerCase().includes(query.toLowerCase())
+            const companyMatch = job.company?.name?.toLowerCase().includes(query.toLowerCase())
+            const categoryMatch = job.categories?.[0]?.name?.toLowerCase().includes(query.toLowerCase())
+            return titleMatch || companyMatch || categoryMatch
+          })
+        : jobs
+
+      return filteredJobs.slice(0, 15).map((job: any) => {
+        // The Muse landing_page URLs are often broken
+        // Best approach: Use their search with company name which works reliably
+        const companyName = job.company?.name || 'company'
+        const jobTitle = job.name || 'position'
+        
+        // Use The Muse's search URL which is more reliable than direct job links
+        const searchQuery = encodeURIComponent(`${jobTitle} ${companyName}`)
+        const jobUrl = `https://www.themuse.com/search/jobs?search=${searchQuery}`
+        
+        return {
+          title: job.name,
+          company: job.company?.name || 'Unknown',
+          location: job.locations?.[0]?.name || 'Flexible',
+          salary: 'Not specified',
+          type: job.levels?.[0]?.name || 'Full-time',
+          description: truncate(stripHtml(job.contents || 'No description'), 300),
+          url: jobUrl,
+          source: 'The Muse',
+          postedDate: job.publication_date
+        }
+      })
     } catch (error) {
       console.log('The Muse API error (continuing):', (error as any).message)
+      return []
+    }
+  }
+
+  /**
+   * Fetch jobs from Arbeitnow (International jobs - Germany focus but worldwide)
+   * Free, no authentication required
+   */
+  private async fetchArbeitnow(query: string, location: string): Promise<JobResult[]> {
+    try {
+      const response = await axios.get('https://www.arbeitnow.com/api/job-board-api', {
+        timeout: 15000,
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+
+      const jobs = response.data.data || []
+      
+      // Filter by query
+      const filteredJobs = query 
+        ? jobs.filter((job: any) => {
+            const titleMatch = job.title?.toLowerCase().includes(query.toLowerCase())
+            const companyMatch = job.company_name?.toLowerCase().includes(query.toLowerCase())
+            const descMatch = job.description?.toLowerCase().includes(query.toLowerCase())
+            return titleMatch || companyMatch || descMatch
+          })
+        : jobs
+
+      return filteredJobs.slice(0, 20).map((job: any) => ({
+        title: job.title,
+        company: job.company_name,
+        location: job.location || 'Remote',
+        salary: 'Not specified',
+        type: job.job_types?.[0] || 'Full-time',
+        description: truncate(stripHtml(job.description || 'No description'), 300),
+        url: job.url,
+        source: 'Arbeitnow',
+        postedDate: job.created_at
+      }))
+    } catch (error) {
+      console.log('Arbeitnow API error (continuing):', (error as any).message)
+      return []
+    }
+  }
+
+  /**
+   * Fetch jobs from JSearch (RapidAPI - Free tier available, aggregates from multiple sources)
+   */
+  private async fetchJSearch(query: string, location: string): Promise<JobResult[]> {
+    try {
+      // Using public GraphQL endpoint (no auth needed)
+      const response = await axios.post('https://jsearch.p.rapidapi.com/search', {
+        query: query || 'software developer',
+        page: 1,
+        num_pages: 1
+      }, {
+        timeout: 15000,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
+          'X-RapidAPI-Key': process.env.RAPIDAPI_KEY || 'demo'
+        }
+      })
+
+      const jobs = response.data.data || []
+      return jobs.slice(0, 15).map((job: any) => ({
+        title: job.job_title,
+        company: job.employer_name,
+        location: `${job.job_city || ''}, ${job.job_country || 'Remote'}`.trim(),
+        salary: job.job_salary || 'Not specified',
+        type: job.job_employment_type || 'Full-time',
+        description: truncate(stripHtml(job.job_description || 'No description'), 300),
+        url: job.job_apply_link,
+        source: 'JSearch',
+        postedDate: job.job_posted_at_datetime_utc
+      }))
+    } catch (error) {
+      console.log('JSearch API error (continuing):', (error as any).message)
+      return []
+    }
+  }
+
+  /**
+   * Fetch jobs from Landing.jobs (Europe focus, tech jobs)
+   * Free, no authentication
+   */
+  private async fetchLandingJobs(query: string): Promise<JobResult[]> {
+    try {
+      const response = await axios.get('https://landing.jobs/api/v1/jobs', {
+        params: {
+          query: query,
+          limit: 20
+        },
+        timeout: 15000,
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+
+      const jobs = response.data || []
+      return jobs.slice(0, 15).map((job: any) => ({
+        title: job.title,
+        company: job.company?.name || 'Unknown',
+        location: `${job.city || ''}, ${job.country_code || 'Remote'}`.trim(),
+        salary: job.salary_range || 'Not specified',
+        type: job.contract_type || 'Full-time',
+        description: truncate(stripHtml(job.description || 'No description'), 300),
+        url: `https://landing.jobs/jobs/${job.id}`,
+        source: 'Landing.jobs',
+        postedDate: job.created_at
+      }))
+    } catch (error) {
+      console.log('Landing.jobs API error (continuing):', (error as any).message)
       return []
     }
   }

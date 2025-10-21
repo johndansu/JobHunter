@@ -21,9 +21,8 @@ import {
   Download,
   Eye,
   ExternalLink,
-  Zap,
-  MoreVertical
-,
+  Briefcase,
+  MoreVertical,
   LogOut,
   User
 } from 'lucide-react'
@@ -220,39 +219,30 @@ const EnterpriseJobDetails = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-40">
-        <div className="container">
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 bg-teal-600 rounded-full flex items-center justify-center">
-                  <Zap className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-slate-900">ScrapePro</span>
-              </div>
-              
-              <nav className="hidden md:flex items-center space-x-6">
-                <Link to="/dashboard" className="nav-item">Dashboard</Link>
-                <Link to="/jobs" className="nav-item">Jobs</Link>
-                <Link to="/data" className="nav-item">Data</Link>
-                <Link to="/analytics" className="nav-item">Analytics</Link>
-                <Link to="/settings" className="nav-item">Settings</Link>
-              </nav>
-            </div>
+            <Link to="/dashboard" className="text-2xl font-bold text-slate-900">
+              JobHunter <span className="text-teal-600">Pro</span>
+            </Link>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-slate-600">
-                <User className="h-4 w-4" />
-                <span className="hidden md:block">{user?.username}</span>
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 font-medium">Dashboard</Link>
+              <Link to="/jobs" className="text-slate-900 font-semibold">Job Searches</Link>
+              <Link to="/data" className="text-slate-600 hover:text-slate-900 font-medium">Results</Link>
+              <Link to="/analytics" className="text-slate-600 hover:text-slate-900 font-medium">Analytics</Link>
+              <Link to="/settings" className="text-slate-600 hover:text-slate-900 font-medium">Settings</Link>
+              
+              <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-slate-200">
+                <span className="text-sm text-slate-600">{user?.username}</span>
+                <button
+                  onClick={logout}
+                  className="text-slate-600 hover:text-slate-900"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
               </div>
-              <button
-                onClick={logout}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Logout</span>
-              </button>
-            </div>
+            </nav>
           </div>
         </div>
       </header>
@@ -452,21 +442,21 @@ const EnterpriseJobDetails = () => {
 
         {activeTab === 'data' && (
           <div className="card">
-            <div className="p-6 border-b border-slate-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-slate-900">Scraped Data</h2>
-                <div className="flex items-center space-x-3">
-                  <button className="btn btn-outline">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Data
-                  </button>
-                  <button className="btn btn-primary">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Refresh
-                  </button>
+              <div className="p-4 md:p-6 border-b border-slate-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <h2 className="text-lg md:text-xl font-semibold text-slate-900">Job Results</h2>
+                  <div className="flex items-center space-x-2 md:space-x-3">
+                    <button className="btn btn-outline text-sm">
+                      <Download className="h-4 w-4 mr-1 md:mr-2" />
+                      <span className="hidden sm:inline">Export</span>
+                    </button>
+                    <button className="btn btn-primary text-sm">
+                      <RefreshCw className="h-4 w-4 mr-1 md:mr-2" />
+                      <span className="hidden sm:inline">Refresh</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
             <div className="p-6">
               {jobData?.scrapedData && jobData?.scrapedData.length > 0 ? (
                 <div className="space-y-6">

@@ -14,6 +14,8 @@ import authRoutes from './routes/auth';
 import jobRoutes from './routes/jobs';
 import dataRoutes from './routes/data';
 import userRoutes from './routes/users';
+import locationRoutes from './routes/locations';
+import searchRoutes from './routes/search';
 import { initializeDatabase } from './utils/database';
 import { setupWebSocket } from './utils/websocket';
 import { scrapingService } from './services/scrapingService';
@@ -87,6 +89,8 @@ app.use('/api/data', dataRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/locations', locationRoutes);
+app.use('/api/search', searchRoutes); // Public job search
 
 // Error handling middleware
 app.use(notFound);

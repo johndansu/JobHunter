@@ -22,10 +22,10 @@ import {
   Globe,
   Zap,
   ChevronLeft,
-  ChevronRight
-,
+  ChevronRight,
   LogOut,
-  User
+  User,
+  Briefcase
 } from 'lucide-react'
 import { jobService } from '@/services/jobService'
 import { formatDistanceToNow } from 'date-fns'
@@ -106,65 +106,56 @@ const EnterpriseJobs = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-40">
-        <div className="container">
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-teal-600 rounded-full flex items-center justify-center">
-                  <Zap className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-slate-900">ScrapePro</span>
-              </div>
-              
-              <nav className="hidden md:flex items-center space-x-6">
-                <Link to="/dashboard" className="nav-item">Dashboard</Link>
-                <Link to="/jobs" className="nav-item-active">Jobs</Link>
-                <Link to="/data" className="nav-item">Data</Link>
-                <Link to="/analytics" className="nav-item">Analytics</Link>
-                <Link to="/settings" className="nav-item">Settings</Link>
-              </nav>
-            </div>
+            <Link to="/dashboard" className="text-2xl font-bold text-slate-900">
+              JobHunter <span className="text-teal-600">Pro</span>
+            </Link>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-slate-600">
-                <User className="h-4 w-4" />
-                <span className="hidden md:block">{user?.username}</span>
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 font-medium">Dashboard</Link>
+              <Link to="/jobs" className="text-slate-900 font-semibold">Job Searches</Link>
+              <Link to="/data" className="text-slate-600 hover:text-slate-900 font-medium">Results</Link>
+              <Link to="/analytics" className="text-slate-600 hover:text-slate-900 font-medium">Analytics</Link>
+              <Link to="/settings" className="text-slate-600 hover:text-slate-900 font-medium">Settings</Link>
+              
+              <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-slate-200">
+                <span className="text-sm text-slate-600">{user?.username}</span>
+                <button
+                  onClick={logout}
+                  className="text-slate-600 hover:text-slate-900"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
               </div>
-              <button
-                onClick={logout}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Logout</span>
-              </button>
-            </div>
+            </nav>
           </div>
         </div>
       </header>
 
-      <div className="container py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Scraping Jobs</h1>
-            <p className="text-slate-600 mt-1">
-              Manage and monitor your web scraping jobs
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Job Searches</h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">
+              Manage and monitor your job search queries
             </p>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button 
               onClick={() => refetch()}
-              className="btn btn-outline"
+              className="inline-flex items-center px-3 sm:px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors text-sm"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
+              <RefreshCw className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Refresh</span>
             </button>
             
-            <Link to="/jobs/create" className="btn btn-primary">
-              <Plus className="h-4 w-4 mr-2" />
-              New Job
+            <Link to="/jobs/create" className="inline-flex items-center px-3 sm:px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium">
+              <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+              <span>New Search</span>
             </Link>
           </div>
         </div>
@@ -198,9 +189,10 @@ const EnterpriseJobs = () => {
               <option value="PAUSED">Paused</option>
             </select>
             
-            <button className="btn btn-outline">
-              <Filter className="h-4 w-4 mr-2" />
-              More Filters
+            <button className="inline-flex items-center px-3 sm:px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors text-sm whitespace-nowrap">
+              <Filter className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">More Filters</span>
+              <span className="sm:hidden">Filters</span>
             </button>
           </div>
         </div>

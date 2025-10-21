@@ -5,7 +5,8 @@ import { authService } from '@/services/authService'
 import Layout from '@/components/Layout'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
-import Welcome from '@/pages/Welcome'
+
+// Admin Dashboard Pages
 import EnterpriseDashboard from '@/pages/EnterpriseDashboard'
 import EnterpriseJobs from '@/pages/EnterpriseJobs'
 import EnterpriseJobDetails from '@/pages/EnterpriseJobDetails'
@@ -13,6 +14,13 @@ import EnterpriseCreateJob from '@/pages/EnterpriseCreateJob'
 import EnterpriseData from '@/pages/EnterpriseData'
 import EnterpriseAnalytics from '@/pages/EnterpriseAnalytics'
 import EnterpriseSettings from '@/pages/EnterpriseSettings'
+
+// Job Board Pages (for regular users)
+import JobBoardLanding from '@/pages/JobBoardLanding'
+import BrowseJobs from '@/pages/BrowseJobs'
+import SavedJobs from '@/pages/SavedJobs'
+
+// Legacy pages
 import Jobs from '@/pages/Jobs'
 import JobDetails from '@/pages/JobDetails'
 import ProfessionalCreateJob from '@/pages/ProfessionalCreateJob'
@@ -80,7 +88,9 @@ function App() {
   if (!user) {
     return (
       <Routes>
-        <Route path="/" element={<Welcome />} />
+        <Route path="/" element={<JobBoardLanding />} />
+        <Route path="/browse" element={<BrowseJobs />} />
+        <Route path="/saved" element={<SavedJobs />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/auth-test" element={<AuthTest />} />
@@ -90,20 +100,37 @@ function App() {
     )
   }
 
+  // Check if user is admin
+  const isAdmin = user.role === 'ADMIN'
+
+  if (isAdmin) {
+    // Admin gets dashboard theme
+    return (
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<EnterpriseDashboard />} />
+        <Route path="/jobs" element={<EnterpriseJobs />} />
+        <Route path="/jobs/:id" element={<EnterpriseJobDetails />} />
+        <Route path="/jobs/create" element={<EnterpriseCreateJob />} />
+        <Route path="/data" element={<EnterpriseData />} />
+        <Route path="/analytics" element={<EnterpriseAnalytics />} />
+        <Route path="/settings" element={<EnterpriseSettings />} />
+        <Route path="/test" element={<Layout><TestScraping /></Layout>} />
+        <Route path="/profile" element={<Layout><Profile /></Layout>} />
+        <Route path="/auth-test" element={<AuthTest />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    )
+  }
+
+  // Regular users get simple job board theme
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<EnterpriseDashboard />} />
-      <Route path="/jobs" element={<EnterpriseJobs />} />
-      <Route path="/jobs/:id" element={<EnterpriseJobDetails />} />
-      <Route path="/jobs/create" element={<EnterpriseCreateJob />} />
-      <Route path="/data" element={<EnterpriseData />} />
-      <Route path="/analytics" element={<EnterpriseAnalytics />} />
-      <Route path="/settings" element={<EnterpriseSettings />} />
-      <Route path="/test" element={<Layout><TestScraping /></Layout>} />
+      <Route path="/" element={<JobBoardLanding />} />
+      <Route path="/browse" element={<BrowseJobs />} />
+      <Route path="/saved" element={<SavedJobs />} />
       <Route path="/profile" element={<Layout><Profile /></Layout>} />
-      <Route path="/auth-test" element={<AuthTest />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -13,16 +13,18 @@ import {
   LogOut,
   User,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Briefcase,
+  Search
 } from 'lucide-react'
 import { jobService } from '@/services/jobService'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/store/authStore'
 
 const smartJobSchema = z.object({
-  name: z.string().min(1, 'Job name is required'),
-  url: z.string().url('Invalid URL format'),
-  description: z.string().min(10, 'Describe what you want to scrape'),
+  name: z.string().min(1, 'Search name is required'),
+  url: z.string().url('Invalid URL format').or(z.literal('')).optional(),
+  description: z.string().min(10, 'Please describe what job you\'re looking for (at least 10 characters)'),
   schedule: z.string().optional(),
 })
 
@@ -51,7 +53,7 @@ export default function EnterpriseCreateJob() {
     const jobData = {
         name: data.name,
         description: data.description,
-        url: data.url,
+        url: data.url || 'https://multi-source.jobsearch', // Placeholder for multi-source search
       config: {
           smartMode: true,
           extractionHints: data.description,
@@ -89,42 +91,43 @@ export default function EnterpriseCreateJob() {
 
   // Quick examples (using sites that are less likely to block)
   const examples = [
-    { site: 'Hacker News', url: 'https://news.ycombinator.com/', desc: 'Extract post titles, authors, points, and comments' },
-    { site: 'Reddit Posts', url: 'https://old.reddit.com/r/programming', desc: 'Get post titles, authors, upvotes, and links' },
-    { site: 'Product Hunt', url: 'https://www.producthunt.com/', desc: 'Scrape product names, descriptions, votes, and makers' },
+    { site: 'Remote Jobs', url: 'https://remotive.com/', desc: 'Remote software engineer jobs with salary and benefits' },
+    { site: 'Tech Jobs', url: 'https://www.themuse.com/', desc: 'Product manager positions in San Francisco' },
+    { site: 'Job Search', url: 'https://news.ycombinator.com/jobs', desc: 'Senior developer jobs at startups, remote or hybrid' },
   ]
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-              <div className="flex items-center space-x-2">
-                  <div className="h-8 w-8 bg-teal-600 rounded-full flex items-center justify-center">
-                    <Zap className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="text-xl font-bold text-slate-900">ScrapePro</span>
-            </div>
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <Link to="/dashboard" className="text-2xl font-bold text-slate-900">
+              JobHunter <span className="text-teal-600">Pro</span>
+            </Link>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-slate-600">
-                <User className="h-4 w-4" />
-                <span>{user?.username}</span>
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link to="/dashboard" className="text-slate-600 hover:text-slate-900 font-medium">Dashboard</Link>
+              <Link to="/jobs" className="text-slate-600 hover:text-slate-900 font-medium">Job Searches</Link>
+              <Link to="/data" className="text-slate-600 hover:text-slate-900 font-medium">Results</Link>
+              <Link to="/analytics" className="text-slate-600 hover:text-slate-900 font-medium">Analytics</Link>
+              <Link to="/settings" className="text-slate-600 hover:text-slate-900 font-medium">Settings</Link>
+              
+              <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-slate-200">
+                <span className="text-sm text-slate-600">{user?.username}</span>
+                <button
+                  onClick={logout}
+                  className="text-slate-600 hover:text-slate-900"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
               </div>
-              <button
-                onClick={logout}
-                className="flex items-center space-x-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Logout</span>
-              </button>
-            </div>
+            </nav>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <button
           onClick={() => navigate('/dashboard')}
           className="flex items-center text-slate-600 hover:text-slate-900 mb-6 transition-colors"
@@ -138,34 +141,34 @@ export default function EnterpriseCreateJob() {
           
           {/* Left Side - Form */}
           <div>
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900">Create Scraping Job</h1>
-              <p className="text-slate-600 text-sm mt-1">Describe what you want to scrape</p>
-        </div>
-
-            {/* Protected Sites Warning */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                  <div className="mb-6">
+                    <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Start Job Search</h1>
+                    <p className="text-slate-600 text-sm mt-1">Tell us what kind of job you're looking for</p>
+          </div>
+          
+            {/* Job Search Info */}
+            <div className="bg-teal-50 border border-teal-200 rounded-lg p-4 mb-6">
               <div className="flex items-start space-x-3">
-                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <Briefcase className="h-5 w-5 text-teal-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-amber-900 text-sm mb-1">⚠️ Protected Sites</h4>
-                  <p className="text-xs text-amber-800 mb-2">
-                    Sites like <strong>Indeed, LinkedIn, Amazon</strong> use Cloudflare and will block scraping from your IP.
+                  <h4 className="font-semibold text-teal-900 text-sm mb-1">🎯 Smart Job Aggregation</h4>
+                  <p className="text-xs text-teal-800 mb-2">
+                    We automatically search across <strong>multiple job boards and APIs</strong> to find the best opportunities for you.
                   </p>
-                  <div className="text-xs text-amber-700">
-                    <p><strong>✅ Works:</strong> News, blogs, public directories, small sites</p>
-                    <p><strong>❌ Blocked:</strong> Major job boards, social media, big e-commerce</p>
-                  </div>
+                  <div className="text-xs text-teal-700">
+                    <p><strong>✅ Instant Results:</strong> Remotive, The Muse, Adzuna, and more</p>
+                    <p><strong>📊 Complete Info:</strong> Salary, location, type, and direct apply links</p>
                 </div>
-              </div>
+            </div>
+          </div>
         </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               
-              {/* Job Name */}
+              {/* Search Name */}
                     <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Job Name
+                  Search Name
                 </label>
                       <input
                   {...register('name')}
@@ -178,34 +181,34 @@ export default function EnterpriseCreateJob() {
                 )}
                     </div>
                     
-              {/* Website URL */}
+              {/* Website URL (Optional) */}
                     <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Website URL
+                  Website URL <span className="text-xs text-slate-500">(Optional - leave blank for multi-source search)</span>
                 </label>
                 <div className="relative">
                   <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <input
                     {...register('url')}
                         type="url"
-                    placeholder="https://example.com"
+                    placeholder="https://example.com (or leave blank to search all sources)"
                     className="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   />
-                </div>
+                    </div>
                 {errors.url && (
                   <p className="mt-1 text-sm text-red-600">{errors.url.message}</p>
                           )}
                         </div>
                         
-              {/* Description */}
+              {/* Job Description */}
                           <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  What to scrape
+                  What job are you looking for?
                 </label>
                 <textarea
                   {...register('description')}
                   rows={4}
-                  placeholder="Extract job titles, company names, locations, and salaries"
+                  placeholder="Example: Remote software engineer jobs with React and Node.js, salary above $100k, anywhere in US or remote"
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
                 />
                 {errors.description && (
@@ -244,8 +247,8 @@ export default function EnterpriseCreateJob() {
                   </>
                 ) : (
                   <>
-                    <Zap className="h-5 w-5" />
-                    <span>Create Job</span>
+                    <Search className="h-5 w-5" />
+                    <span>Start Job Search</span>
                   </>
                 )}
               </button>
@@ -267,30 +270,30 @@ export default function EnterpriseCreateJob() {
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
                       {urlValue || 'Website URL'}
-                    </p>
-                  </div>
-                </div>
+                          </p>
+                        </div>
+                      </div>
 
                 <div className="border-t border-slate-200 pt-4">
                   <p className="text-xs font-medium text-slate-700 mb-2">Will extract:</p>
                   <p className="text-sm text-slate-600">
                     {descriptionValue || 'Data description will appear here'}
-                  </p>
-                </div>
-
+                      </p>
+                    </div>
+                    
                 <div className="border-t border-slate-200 pt-4">
                   <p className="text-xs text-slate-500">
                     Scraping will start automatically after creation
                   </p>
-                </div>
                           </div>
+                        </div>
             ) : (
               <div className="space-y-4">
                 <div className="flex items-start space-x-3 text-slate-400">
                   <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                   <p className="text-sm">Fill in the form to see a preview</p>
-                </div>
-
+                    </div>
+                    
                 {/* Quick Examples */}
                 <div className="border-t border-slate-200 pt-4">
                   <p className="text-xs font-medium text-slate-700 mb-3">Quick examples:</p>
@@ -325,12 +328,12 @@ export default function EnterpriseCreateJob() {
                         <p className="font-medium text-slate-900">{ex.site}</p>
                         <p className="text-slate-600 mt-1">{ex.desc}</p>
                       </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
             )}
-          </div>
+              </div>
 
         </div>
       </div>
