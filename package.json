@@ -1,0 +1,26 @@
+{
+  "name": "web-scraper-pro",
+  "version": "1.0.0",
+  "description": "Professional Web Scraping Application",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "start": "cd server && npm start",
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "clean": "rimraf server/dist client/dist node_modules server/node_modules client/node_modules",
+    "reset": "npm run clean && npm run install:all",
+    "start:dev": "npm run install:all && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

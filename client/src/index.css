@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-slate-200;
+  }
+  
+  body {
+    @apply bg-white text-slate-900 font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-slate-900;
+  }
+  
+  /* Color System Variables */
+  :root {
+    --color-text-primary: theme('colors.gray.900');
+    --color-text-muted: theme('colors.gray.600');
+    --color-border: theme('colors.gray.200');
+    --color-surface: theme('colors.white');
+    --color-primary-50: theme('colors.teal.50');
+    --color-primary-100: theme('colors.teal.100');
+    --color-primary-500: theme('colors.teal.500');
+    --color-primary-600: theme('colors.teal.600');
+    --color-secondary-50: theme('colors.slate.50');
+    --color-secondary-100: theme('colors.slate.100');
+    --color-secondary-200: theme('colors.slate.200');
+    --color-success: theme('colors.green.600');
+    --color-error: theme('colors.red.600');
+    --color-warning: theme('colors.yellow.600');
+  }
+}
+
+@layer components {
+  /* Dashboard Design System */
+  .page-container {
+    @apply min-h-screen bg-gradient-to-br from-slate-50 to-teal-50;
+  }
+  
+  .page-header {
+    @apply bg-white border-b border-gray-200 px-6 py-8;
+  }
+  
+  .page-header-content {
+    @apply max-w-7xl mx-auto;
+  }
+  
+  .page-title {
+    @apply text-3xl font-bold text-gray-900;
+  }
+  
+  .page-subtitle {
+    @apply text-gray-600 mt-1;
+  }
+  
+  .page-content {
+    @apply max-w-7xl mx-auto px-6 py-8 space-y-8;
+  }
+  
+  .gradient-button {
+    @apply bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-teal-700 hover:to-emerald-700 transition-all duration-200 flex items-center;
+  }
+
+  /* Enterprise Button System */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-primary {
+    @apply bg-teal-600 text-white hover:bg-teal-700 shadow-sm;
+  }
+  
+  .btn-secondary {
+    @apply bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-200;
+  }
+  
+  .btn-outline {
+    @apply border border-slate-200 bg-white hover:bg-slate-50 text-slate-900;
+  }
+  
+  .btn-ghost {
+    @apply hover:bg-slate-100 hover:text-slate-900;
+  }
+  
+  .btn-success {
+    @apply bg-emerald-600 text-white hover:bg-emerald-700;
+  }
+  
+  .btn-warning {
+    @apply bg-amber-500 text-white hover:bg-amber-600;
+  }
+  
+  .btn-error {
+    @apply bg-red-600 text-white hover:bg-red-700;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+  
+  /* Enterprise Card System */
+  .card {
+    @apply rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm;
+  }
+  
+  .card-hover {
+    @apply card hover:shadow-md transition-shadow duration-200;
+  }
+  
+  .card-interactive {
+    @apply card-hover cursor-pointer hover:border-teal-200;
+  }
+  
+  /* Enterprise Form System */
+  .input {
+    @apply flex h-11 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  
+  .input-error {
+    @apply input border-red-500 focus-visible:ring-red-500;
+  }
+  
+  .label {
+    @apply text-sm font-medium leading-none text-slate-900;
+  }
+  
+  .label-required::after {
+    content: " *";
+    @apply text-red-500;
+  }
+  
+  /* Enterprise Navigation */
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors;
+  }
+  
+  .nav-item-active {
+    @apply nav-item text-slate-900 bg-slate-100;
+  }
+  
+  /* Enhanced Status System */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .badge-error {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-info {
+    @apply bg-teal-100 text-teal-800;
+  }
+  
+  .badge-secondary {
+    @apply bg-gray-100 text-gray-800;
+  }
+  
+  /* Enterprise Status Indicators */
+  .status-success {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+  
+  .status-warning {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200;
+  }
+  
+  .status-error {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200;
+  }
+  
+  .status-info {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200;
+  }
+  
+  /* Enterprise Layout */
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .section {
+    @apply py-8 lg:py-12;
+  }
+  
+  /* Enhanced Tables */
+  .table-header {
+    @apply bg-gray-50;
+  }
+  
+  .table-row {
+    @apply hover:bg-gray-50;
+  }
+  
+  /* Enterprise Tables */
+  .table {
+    @apply w-full border-collapse;
+  }
+  
+  .table th {
+    @apply px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider border-b border-slate-200 bg-slate-50;
+  }
+  
+  .table td {
+    @apply px-4 py-4 text-sm text-slate-900 border-b border-slate-200;
+  }
+  
+  .table tbody tr:hover {
+    @apply bg-slate-50;
+  }
+  
+  /* Enterprise Metrics */
+  .metric-card {
+    @apply card p-6;
+  }
+  
+  .metric-value {
+    @apply text-2xl font-bold text-slate-900;
+  }
+  
+  .metric-label {
+    @apply text-sm text-slate-500 mt-1;
+  }
+  
+  .metric-change {
+    @apply text-xs font-medium mt-1;
+  }
+  
+  .metric-change-positive {
+    @apply metric-change text-emerald-600;
+  }
+  
+  .metric-change-negative {
+    @apply metric-change text-red-600;
+  }
+  
+  /* Legacy compatibility */
+  .sidebar-item {
+    @apply nav-item;
+  }
+  
+  .sidebar-item-active {
+    @apply nav-item-active;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

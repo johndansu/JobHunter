@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      String   @default("USER") // ADMIN or USER
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  jobs      Job[]
+  sessions  Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  url         String
+  status      String    @default("PENDING") // PENDING, RUNNING, COMPLETED, FAILED, PAUSED, CANCELLED
+  config      String    // Scraping configuration as JSON string
+  schedule    String?   // Cron expression for scheduled jobs
+  userId      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastRunAt   DateTime?
+  nextRunAt   DateTime?
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  executions  JobExecution[]
+  scrapedData ScrapedData[]
+
+  @@map("jobs")
+}
+
+model JobExecution {
+  id          String            @id @default(cuid())
+  jobId       String
+  status      String            @default("RUNNING") // RUNNING, COMPLETED, FAILED, CANCELLED
+  startedAt   DateTime          @default(now())
+  completedAt DateTime?
+  duration    Int?              // Duration in milliseconds
+  pagesScraped Int              @default(0)
+  dataPoints  Int               @default(0)
+  error       String?
+  logs        String?           // Execution logs as JSON string
+
+  // Relations
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("job_executions")
+}
+
+model ScrapedData {
+  id          String   @id @default(cuid())
+  jobId       String
+  url         String
+  data        String   // Scraped data as JSON string
+  metadata    String?  // Additional metadata as JSON string
+  scrapedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("scraped_data")
+}
+
+// Enums are replaced with string constants in SQLite
+// UserRole: "ADMIN" | "USER"
+// JobStatus: "PENDING" | "RUNNING" | "COMPLETED" | "FAILED" | "PAUSED" | "CANCELLED"
+// ExecutionStatus: "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED"

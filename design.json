@@ -1,0 +1,135 @@
+{
+    "project": "Web Scraper Pro",
+    "version": "1.0",
+    "design": {
+      "theme": {
+        "mode": "light",
+        "primaryColor": "#1C1C1C",
+        "secondaryColor": "#595959",
+        "accentColor": "#4CAF50",
+        "background": "#F9FAFB",
+        "surface": "#FFFFFF",
+        "borderColor": "#E5E7EB",
+        "textColor": "#111827",
+        "textMuted": "#6B7280",
+        "success": "#22C55E",
+        "warning": "#F59E0B",
+        "error": "#EF4444",
+        "fontFamily": "Inter, 'Helvetica Neue', Arial, sans-serif"
+      },
+      "layout": {
+        "maxWidth": "1280px",
+        "gutter": "24px",
+        "borderRadius": "12px",
+        "shadow": "0 2px 6px rgba(0, 0, 0, 0.05)",
+        "spacing": {
+          "xs": "4px",
+          "sm": "8px",
+          "md": "16px",
+          "lg": "24px",
+          "xl": "48px"
+        }
+      },
+      "components": {
+        "navbar": {
+          "height": "64px",
+          "background": "#FFFFFF",
+          "shadow": "0 1px 3px rgba(0, 0, 0, 0.1)",
+          "textColor": "#111827",
+          "logoPosition": "left",
+          "menuPosition": "right",
+          "searchBar": true
+        },
+        "sidebar": {
+          "width": "250px",
+          "background": "#F3F4F6",
+          "activeItemColor": "#4CAF50",
+          "textColor": "#374151",
+          "iconSize": "20px",
+          "collapsedWidth": "72px"
+        },
+        "dashboard": {
+          "grid": {
+            "columns": 12,
+            "gap": "24px"
+          },
+          "sections": [
+            {
+              "name": "Overview",
+              "layout": "row",
+              "widgets": ["jobCount", "dataVolume", "successRate"]
+            },
+            {
+              "name": "Recent Jobs",
+              "layout": "table",
+              "columns": ["Job Name", "Status", "Pages Scraped", "Duration", "Last Run"]
+            },
+            {
+              "name": "Data Visualization",
+              "layout": "grid",
+              "charts": ["bar", "line", "pie"]
+            }
+          ]
+        },
+        "cards": {
+          "background": "#FFFFFF",
+          "border": "1px solid #E5E7EB",
+          "borderRadius": "12px",
+          "padding": "16px",
+          "shadow": "0 2px 6px rgba(0, 0, 0, 0.04)"
+        },
+        "buttons": {
+          "primary": {
+            "background": "#4CAF50",
+            "color": "#FFFFFF",
+            "hoverBackground": "#43A047",
+            "radius": "8px",
+            "padding": "10px 16px",
+            "fontWeight": "600"
+          },
+          "secondary": {
+            "background": "#FFFFFF",
+            "color": "#1C1C1C",
+            "border": "1px solid #D1D5DB",
+            "hoverBackground": "#F3F4F6"
+          }
+        },
+        "forms": {
+          "inputBackground": "#FFFFFF",
+          "border": "1px solid #D1D5DB",
+          "focusBorder": "#4CAF50",
+          "borderRadius": "8px",
+          "labelColor": "#374151"
+        },
+        "tables": {
+          "headerBackground": "#F9FAFB",
+          "headerTextColor": "#111827",
+          "rowHoverBackground": "#F3F4F6",
+          "borderColor": "#E5E7EB"
+        },
+        "charts": {
+          "palette": ["#4CAF50", "#3B82F6", "#F59E0B", "#10B981", "#6366F1"],
+          "background": "#FFFFFF",
+          "gridLines": "#E5E7EB",
+          "fontColor": "#111827"
+        },
+        "notifications": {
+          "successBackground": "#DCFCE7",
+          "errorBackground": "#FEE2E2",
+          "warningBackground": "#FEF3C7",
+          "borderRadius": "8px"
+        }
+      },
+      "animations": {
+        "enable": true,
+        "duration": "200ms",
+        "easing": "ease-in-out"
+      },
+      "accessibility": {
+        "contrastRatio": "AA",
+        "focusRing": "2px solid #4CAF50",
+        "fontScale": true
+      }
+    }
+  }
+  
