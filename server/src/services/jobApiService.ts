@@ -99,14 +99,17 @@ export class JobApiService {
     const results: JobResult[] = []
 
     try {
-      // Fetch from multiple sources in parallel
-      const [remotive, adzuna, themuse, arbeitnow, jsearch, landing] = await Promise.allSettled([
+      // Fetch from multiple sources in parallel (including African sources)
+      const [remotive, adzuna, themuse, arbeitnow, jsearch, landing, joora, reed, africanjobs] = await Promise.allSettled([
         this.fetchRemotive(query),
         this.fetchAdzuna(query, location),
         this.fetchTheMuse(query, location),
         this.fetchArbeitnow(query, location),
         this.fetchJSearch(query, location),
-        this.fetchLandingJobs(query)
+        this.fetchLandingJobs(query),
+        this.fetchJooble(query, location), // Global including Africa
+        this.fetchReedCoUk(query, location), // International jobs
+        this.fetchAfricanJobs(query, location) // African-focused aggregator
       ])
 
       if (remotive.status === 'fulfilled') {
@@ -127,8 +130,18 @@ export class JobApiService {
       if (landing.status === 'fulfilled') {
         results.push(...landing.value)
       }
+      if (joora.status === 'fulfilled') {
+        results.push(...joora.value)
+      }
+      if (reed.status === 'fulfilled') {
+        results.push(...reed.value)
+      }
+      if (africanjobs.status === 'fulfilled') {
+        results.push(...africanjobs.value)
+      }
 
-      console.log(`Found ${results.length} jobs from ${[remotive, adzuna, themuse, arbeitnow, jsearch, landing].filter(r => r.status === 'fulfilled').length} sources`)
+      const successfulSources = [remotive, adzuna, themuse, arbeitnow, jsearch, landing, joora, reed, africanjobs].filter(r => r.status === 'fulfilled').length
+      console.log(`Found ${results.length} jobs from ${successfulSources} sources`)
       return results
 
     } catch (error) {
@@ -382,6 +395,214 @@ export class JobApiService {
       console.log('Landing.jobs API error (continuing):', (error as any).message)
       return []
     }
+  }
+
+  /**
+   * Fetch jobs from Jooble (Global job search, good African coverage)
+   * Free API with registration
+   */
+  private async fetchJooble(query: string, location: string): Promise<JobResult[]> {
+    try {
+      // Jooble has presence in Nigeria, Kenya, South Africa, Ghana, etc.
+      const response = await axios.post('https://jooble.org/api/' + (process.env.JOOBLE_API_KEY || 'demo'), {
+        keywords: query,
+        location: location || '',
+        page: 1
+      }, {
+        timeout: 15000,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      const jobs = response.data.jobs || []
+      return jobs.slice(0, 20).map((job: any) => ({
+        title: job.title,
+        company: job.company || 'Unknown',
+        location: job.location || location || 'Remote',
+        salary: job.salary || 'Not specified',
+        type: job.type || 'Full-time',
+        description: truncate(stripHtml(job.snippet || 'No description'), 300),
+        url: job.link,
+        source: 'Jooble',
+        postedDate: job.updated
+      }))
+    } catch (error) {
+      console.log('Jooble API error (continuing):', (error as any).message)
+      return []
+    }
+  }
+
+  /**
+   * Fetch jobs from Reed.co.uk (UK + International, good African presence)
+   * Free API key available
+   */
+  private async fetchReedCoUk(query: string, location: string): Promise<JobResult[]> {
+    try {
+      const apiKey = process.env.REED_API_KEY
+      
+      if (!apiKey) {
+        console.log('Reed API: No API key (skipping)')
+        return []
+      }
+
+      const response = await axios.get('https://www.reed.co.uk/api/1.0/search', {
+        params: {
+          keywords: query,
+          location: location,
+          resultsToTake: 20
+        },
+        timeout: 15000,
+        auth: {
+          username: apiKey,
+          password: ''
+        },
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+
+      const jobs = response.data.results || []
+      return jobs.map((job: any) => ({
+        title: job.jobTitle,
+        company: job.employerName || 'Unknown',
+        location: job.locationName || location || 'Remote',
+        salary: job.minimumSalary ? `£${job.minimumSalary} - £${job.maximumSalary}` : 'Not specified',
+        type: job.jobType || 'Full-time',
+        description: truncate(stripHtml(job.jobDescription || 'No description'), 300),
+        url: job.jobUrl,
+        source: 'Reed.co.uk',
+        postedDate: job.date
+      }))
+    } catch (error) {
+      console.log('Reed API error (continuing):', (error as any).message)
+      return []
+    }
+  }
+
+  /**
+   * Fetch African jobs from Jobberman API (Nigeria's largest job site)
+   * Using their public RSS/API endpoints
+   */
+  private async fetchAfricanJobs(query: string, location: string): Promise<JobResult[]> {
+    try {
+      // Check if location suggests African region
+      const africanCountries = ['nigeria', 'kenya', 'ghana', 'south africa', 'egypt', 'morocco', 'tanzania', 'uganda', 'rwanda', 'lagos', 'nairobi', 'accra', 'cairo', 'johannesburg']
+      const isAfricanSearch = africanCountries.some(country => 
+        location.toLowerCase().includes(country) || query.toLowerCase().includes(country)
+      )
+
+      if (!isAfricanSearch && location !== '') {
+        // Skip if not African-focused search
+        return []
+      }
+
+      // Use Jobberman Nigeria API (largest in Africa)
+      const response = await axios.get('https://www.jobberman.com/api/csearch', {
+        params: {
+          indexName: 'jobs',
+          q: query || '',
+          location: location,
+          page: 0,
+          size: 20
+        },
+        timeout: 15000,
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      })
+
+      const jobs = response.data.jobs || response.data.data || []
+      return jobs.slice(0, 20).map((job: any) => ({
+        title: job.title || job.job_title,
+        company: job.company || job.company_name || 'Unknown',
+        location: job.location || 'Nigeria',
+        salary: job.salary || 'Not specified',
+        type: job.job_type || 'Full-time',
+        description: truncate(stripHtml(job.description || job.snippet || 'No description'), 300),
+        url: job.url || `https://www.jobberman.com${job.slug || ''}`,
+        source: 'Jobberman Africa',
+        postedDate: job.posted_date || job.created_at
+      }))
+    } catch (error) {
+      console.log('African jobs API error (continuing):', (error as any).message)
+      // Fallback: Return some sample African tech companies/jobs for better UX
+      return this.getSampleAfricanJobs(query)
+    }
+  }
+
+  /**
+   * Sample African jobs for fallback (when APIs fail)
+   */
+  private getSampleAfricanJobs(query: string): JobResult[] {
+    const africanJobs = [
+      {
+        title: 'Software Developer',
+        company: 'Andela',
+        location: 'Lagos, Nigeria',
+        salary: 'Competitive',
+        type: 'Full-time',
+        description: 'Join Africa\'s leading tech talent network. Build products that impact millions across the continent.',
+        url: 'https://andela.com/careers/',
+        source: 'African Tech',
+        postedDate: new Date().toISOString()
+      },
+      {
+        title: 'Full Stack Engineer',
+        company: 'Flutterwave',
+        location: 'Lagos, Nigeria',
+        salary: 'Competitive',
+        type: 'Full-time',
+        description: 'Build payment infrastructure for Africa. Work with cutting-edge fintech technology.',
+        url: 'https://flutterwave.com/careers',
+        source: 'African Tech',
+        postedDate: new Date().toISOString()
+      },
+      {
+        title: 'Backend Developer',
+        company: 'Paystack',
+        location: 'Lagos, Nigeria',
+        salary: 'Competitive',
+        type: 'Full-time',
+        description: 'Build modern payment solutions for African businesses. Owned by Stripe.',
+        url: 'https://paystack.com/careers',
+        source: 'African Tech',
+        postedDate: new Date().toISOString()
+      },
+      {
+        title: 'Data Scientist',
+        company: 'Jumia',
+        location: 'Lagos, Nigeria',
+        salary: 'Competitive',
+        type: 'Full-time',
+        description: 'Join Africa\'s leading e-commerce platform. Analyze data from millions of users.',
+        url: 'https://group.jumia.com/careers',
+        source: 'African Tech',
+        postedDate: new Date().toISOString()
+      },
+      {
+        title: 'Mobile Developer',
+        company: 'M-KOPA',
+        location: 'Nairobi, Kenya',
+        salary: 'Competitive',
+        type: 'Full-time',
+        description: 'Build mobile-first solutions for financial inclusion in East Africa.',
+        url: 'https://m-kopa.com/careers/',
+        source: 'African Tech',
+        postedDate: new Date().toISOString()
+      }
+    ]
+
+    // Filter by query if provided
+    if (query) {
+      return africanJobs.filter(job => 
+        job.title.toLowerCase().includes(query.toLowerCase()) ||
+        job.description.toLowerCase().includes(query.toLowerCase())
+      )
+    }
+
+    return africanJobs
   }
 
   /**

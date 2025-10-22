@@ -2,10 +2,72 @@ import { Router, Request, Response } from 'express'
 
 const router = Router()
 
-// International cities and "Remote" options
+// International cities and "Remote" options (with strong African coverage)
 const POPULAR_LOCATIONS = [
   'Remote',
   'Anywhere',
+  // Africa - West Africa
+  'Lagos, Nigeria',
+  'Abuja, Nigeria',
+  'Port Harcourt, Nigeria',
+  'Ibadan, Nigeria',
+  'Kano, Nigeria',
+  'Accra, Ghana',
+  'Kumasi, Ghana',
+  'Dakar, Senegal',
+  'Abidjan, Ivory Coast',
+  'Bamako, Mali',
+  'Conakry, Guinea',
+  'Freetown, Sierra Leone',
+  'Monrovia, Liberia',
+  'Ouagadougou, Burkina Faso',
+  'Niamey, Niger',
+  'Lome, Togo',
+  'Cotonou, Benin',
+  // Africa - East Africa
+  'Nairobi, Kenya',
+  'Mombasa, Kenya',
+  'Kampala, Uganda',
+  'Dar es Salaam, Tanzania',
+  'Kigali, Rwanda',
+  'Addis Ababa, Ethiopia',
+  'Asmara, Eritrea',
+  'Mogadishu, Somalia',
+  'Djibouti, Djibouti',
+  'Bujumbura, Burundi',
+  // Africa - North Africa
+  'Cairo, Egypt',
+  'Alexandria, Egypt',
+  'Casablanca, Morocco',
+  'Rabat, Morocco',
+  'Marrakech, Morocco',
+  'Tunis, Tunisia',
+  'Algiers, Algeria',
+  'Tripoli, Libya',
+  'Khartoum, Sudan',
+  // Africa - Southern Africa
+  'Cape Town, South Africa',
+  'Johannesburg, South Africa',
+  'Pretoria, South Africa',
+  'Durban, South Africa',
+  'Lusaka, Zambia',
+  'Harare, Zimbabwe',
+  'Gaborone, Botswana',
+  'Windhoek, Namibia',
+  'Maputo, Mozambique',
+  'Maseru, Lesotho',
+  'Mbabane, Eswatini',
+  'Antananarivo, Madagascar',
+  'Port Louis, Mauritius',
+  // Africa - Central Africa
+  'Kinshasa, DR Congo',
+  'Brazzaville, Congo',
+  'Libreville, Gabon',
+  'Yaounde, Cameroon',
+  'Douala, Cameroon',
+  'Bangui, Central African Republic',
+  'N\'Djamena, Chad',
+  'Malabo, Equatorial Guinea',
   // North America
   'New York, NY',
   'San Francisco, CA',
@@ -35,11 +97,6 @@ const POPULAR_LOCATIONS = [
   'Mumbai, India',
   'Dubai, UAE',
   'Tel Aviv, Israel',
-  // Africa
-  'Lagos, Nigeria',
-  'Cape Town, South Africa',
-  'Nairobi, Kenya',
-  'Cairo, Egypt',
   // Australia
   'Sydney, Australia',
   'Melbourne, Australia'
