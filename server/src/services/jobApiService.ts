@@ -26,6 +26,18 @@ export class JobApiService {
   }
 
   /**
+   * Shuffle array using Fisher-Yates algorithm
+   */
+  private shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
+
+  /**
    * Detect if a search query is job-related
    */
   isJobQuery(description: string): boolean {
@@ -142,7 +154,10 @@ export class JobApiService {
 
       const successfulSources = [remotive, adzuna, themuse, arbeitnow, jsearch, landing, joora, reed, africanjobs].filter(r => r.status === 'fulfilled').length
       console.log(`Found ${results.length} jobs from ${successfulSources} sources`)
-      return results
+      
+      // Shuffle results to mix jobs from different sources
+      const shuffledResults = this.shuffleArray(results)
+      return shuffledResults
 
     } catch (error) {
       console.error('Job API search error:', error)
@@ -380,17 +395,30 @@ export class JobApiService {
       })
 
       const jobs = response.data || []
-      return jobs.slice(0, 15).map((job: any) => ({
-        title: job.title,
-        company: job.company?.name || 'Unknown',
-        location: `${job.city || ''}, ${job.country_code || 'Remote'}`.trim(),
-        salary: job.salary_range || 'Not specified',
-        type: job.contract_type || 'Full-time',
-        description: truncate(stripHtml(job.description || 'No description'), 300),
-        url: `https://landing.jobs/jobs/${job.id}`,
-        source: 'Landing.jobs',
-        postedDate: job.created_at
-      }))
+      return jobs.slice(0, 15).map((job: any) => {
+        // Try multiple possible description fields
+        const rawDescription = job.description || job.short_description || job.summary || job.excerpt || job.body || ''
+        
+        // Create a meaningful description even if API doesn't provide one
+        let description = rawDescription
+        if (!description || description.trim() === '') {
+          const skills = job.tags?.slice(0, 3).join(', ') || ''
+          const companyInfo = job.company?.name || 'Unknown company'
+          description = `${job.title} position at ${companyInfo}${skills ? `. Skills: ${skills}` : ''}. Visit the job page for full details.`
+        }
+        
+        return {
+          title: job.title,
+          company: job.company?.name || 'Unknown',
+          location: `${job.city || ''}, ${job.country_code || 'Remote'}`.trim(),
+          salary: job.salary_range || 'Not specified',
+          type: job.contract_type || 'Full-time',
+          description: truncate(stripHtml(description), 300),
+          url: `https://landing.jobs/jobs/${job.id}`,
+          source: 'Landing.jobs',
+          postedDate: job.created_at
+        }
+      })
     } catch (error) {
       console.log('Landing.jobs API error (continuing):', (error as any).message)
       return []
@@ -527,82 +555,9 @@ export class JobApiService {
       }))
     } catch (error) {
       console.log('African jobs API error (continuing):', (error as any).message)
-      // Fallback: Return some sample African tech companies/jobs for better UX
-      return this.getSampleAfricanJobs(query)
+      // No fallback - rely on other API sources for real job listings
+      return []
     }
-  }
-
-  /**
-   * Sample African jobs for fallback (when APIs fail)
-   */
-  private getSampleAfricanJobs(query: string): JobResult[] {
-    const africanJobs = [
-      {
-        title: 'Software Developer',
-        company: 'Andela',
-        location: 'Lagos, Nigeria',
-        salary: 'Competitive',
-        type: 'Full-time',
-        description: 'Join Africa\'s leading tech talent network. Build products that impact millions across the continent.',
-        url: 'https://andela.com/careers/',
-        source: 'African Tech',
-        postedDate: new Date().toISOString()
-      },
-      {
-        title: 'Full Stack Engineer',
-        company: 'Flutterwave',
-        location: 'Lagos, Nigeria',
-        salary: 'Competitive',
-        type: 'Full-time',
-        description: 'Build payment infrastructure for Africa. Work with cutting-edge fintech technology.',
-        url: 'https://flutterwave.com/careers',
-        source: 'African Tech',
-        postedDate: new Date().toISOString()
-      },
-      {
-        title: 'Backend Developer',
-        company: 'Paystack',
-        location: 'Lagos, Nigeria',
-        salary: 'Competitive',
-        type: 'Full-time',
-        description: 'Build modern payment solutions for African businesses. Owned by Stripe.',
-        url: 'https://paystack.com/careers',
-        source: 'African Tech',
-        postedDate: new Date().toISOString()
-      },
-      {
-        title: 'Data Scientist',
-        company: 'Jumia',
-        location: 'Lagos, Nigeria',
-        salary: 'Competitive',
-        type: 'Full-time',
-        description: 'Join Africa\'s leading e-commerce platform. Analyze data from millions of users.',
-        url: 'https://group.jumia.com/careers',
-        source: 'African Tech',
-        postedDate: new Date().toISOString()
-      },
-      {
-        title: 'Mobile Developer',
-        company: 'M-KOPA',
-        location: 'Nairobi, Kenya',
-        salary: 'Competitive',
-        type: 'Full-time',
-        description: 'Build mobile-first solutions for financial inclusion in East Africa.',
-        url: 'https://m-kopa.com/careers/',
-        source: 'African Tech',
-        postedDate: new Date().toISOString()
-      }
-    ]
-
-    // Filter by query if provided
-    if (query) {
-      return africanJobs.filter(job => 
-        job.title.toLowerCase().includes(query.toLowerCase()) ||
-        job.description.toLowerCase().includes(query.toLowerCase())
-      )
-    }
-
-    return africanJobs
   }
 
   /**

@@ -9,17 +9,49 @@ import {
   DollarSign,
   ExternalLink,
   User,
-  LogOut
+  LogOut,
+  Bookmark,
+  CheckCircle2,
+  TrendingUp,
+  Filter,
+  SortAsc,
+  Trash2,
+  FolderOpen,
+  Star
 } from 'lucide-react'
 import { dataService } from '@/services/dataService'
 import { useAuthStore } from '@/store/authStore'
 import { cleanDescription } from '@/utils/htmlCleaner'
+import { useToast } from '@/components/ToastContainer'
+import { JobCardSkeleton } from '@/components/SkeletonLoader'
+import { ThemeSwitcher } from '@/components/ThemeSwitcher'
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
+import { useExitIntent } from '@/hooks/useExitIntent'
+import { ExitIntentModal } from '@/components/ExitIntentModal'
+import { RecentlyViewed } from '@/components/RecentlyViewed'
 
 export default function SavedJobs() {
   const { user, logout } = useAuthStore()
+  const { showInfo, showSuccess } = useToast()
   const [savedJobs, setSavedJobs] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('savedJobs')
     return saved ? new Set(JSON.parse(saved)) : new Set()
+  })
+  const [visibleJobsCount, setVisibleJobsCount] = useState(20)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [showExitIntent, setShowExitIntent] = useState(false)
+
+  // Exit intent - only show if not dismissed and no email captured
+  const shouldShowExitIntent = !localStorage.getItem('exitIntentDismissed') && !localStorage.getItem('exitIntentEmail')
+  
+  useExitIntent({
+    onExitIntent: () => {
+      if (shouldShowExitIntent) {
+        setShowExitIntent(true)
+      }
+    },
+    delay: 3000, // Wait 3 seconds before enabling
+    enabled: shouldShowExitIntent
   })
 
   const { data: jobsData, isLoading } = useQuery({
@@ -27,7 +59,10 @@ export default function SavedJobs() {
     queryFn: () => dataService.getData({ limit: 100 })
   })
 
-  const toggleSaveJob = (jobKey: string) => {
+  const toggleSaveJob = (jobKey: string, jobTitle?: string) => {
+    const wasSaved = savedJobs.has(jobKey)
+    const previousState = new Set(savedJobs)
+    
     setSavedJobs(prev => {
       const newSet = new Set(prev)
       if (newSet.has(jobKey)) {
@@ -38,6 +73,21 @@ export default function SavedJobs() {
       localStorage.setItem('savedJobs', JSON.stringify([...newSet]))
       return newSet
     })
+
+    if (wasSaved) {
+      // Job was removed
+      showInfo(
+        jobTitle ? `Removed "${jobTitle}"` : 'Job removed from saved',
+        {
+          label: 'Undo',
+          onClick: () => {
+            setSavedJobs(previousState)
+            localStorage.setItem('savedJobs', JSON.stringify([...previousState]))
+            showSuccess('Job saved again')
+          }
+        }
+      )
+    }
   }
 
   const parseData = (data: any) => {
@@ -53,78 +103,149 @@ export default function SavedJobs() {
 
   // Filter only saved jobs
   const allJobs = jobsData?.data || []
-  const filteredSavedJobs = allJobs.filter((item: any) => {
+  const allSavedJobs = allJobs.filter((item: any) => {
     const job = parseData(item.data)
     if (!job) return false
     const jobKey = `${item.id}-${job.title || 'untitled'}`
     return savedJobs.has(jobKey)
   })
 
+  const filteredSavedJobs = allSavedJobs.slice(0, visibleJobsCount)
+  const hasMoreJobs = visibleJobsCount < allSavedJobs.length
+
+  // Infinite scroll - Load more jobs
+  const loadMoreJobs = () => {
+    if (!isLoadingMore && hasMoreJobs) {
+      setIsLoadingMore(true)
+      
+      setTimeout(() => {
+        setVisibleJobsCount(prev => Math.min(prev + 20, allSavedJobs.length))
+        setIsLoadingMore(false)
+      }, 500)
+    }
+  }
+
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: loadMoreJobs,
+    hasMore: hasMoreJobs,
+    isLoading: isLoadingMore,
+    threshold: 0.8
+  })
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      {/* Simple Header */}
+      <header className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="text-2xl font-bold text-slate-900">
+            <Link to="/" className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               Job<span className="text-teal-600">Hunter</span>
             </Link>
 
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link to="/browse" className="text-slate-600 hover:text-slate-900 font-medium">
+            <nav className="hidden md:flex items-center space-x-1">
+              <Link 
+                to="/browse" 
+                className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 font-medium hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
                 Browse Jobs
               </Link>
-              <Link to="/saved" className="text-slate-900 font-semibold">
+              <Link 
+                to="/saved" 
+                className="px-4 py-2 text-white font-semibold bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors inline-flex items-center gap-2"
+              >
+                <Bookmark className="h-4 w-4" />
                 Saved ({savedJobs.size})
               </Link>
-              {user && (
-                <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-slate-200">
-                  <span className="text-sm text-slate-600">{user.username}</span>
-                  <button onClick={logout} className="text-slate-600 hover:text-slate-900">
-                    <LogOut className="h-5 w-5" />
-                  </button>
-                </div>
-              )}
+              <div className="ml-4 pl-4 border-l border-slate-200 dark:border-slate-700">
+                <ThemeSwitcher />
+              </div>
+              <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-slate-200 dark:border-slate-700">
+                {user && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 bg-teal-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                        {user.username}
+                      </span>
+                    </div>
+                    <button 
+                      onClick={logout} 
+                      className="inline-flex items-center gap-2 px-3 py-2 text-slate-700 dark:text-slate-300 hover:text-white hover:bg-red-600 dark:hover:bg-red-600 rounded-lg transition-all font-medium"
+                      title="Logout"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span className="text-sm">Logout</span>
+                    </button>
+                  </>
+                )}
+                {!user && (
+                  <Link 
+                    to="/login"
+                    className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-medium"
+                  >
+                    Login
+                  </Link>
+                )}
+              </div>
             </nav>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {/* Clean Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-3">
-            <Heart className="h-8 w-8 text-red-500 fill-current" />
-            Saved Jobs
-          </h1>
-          <p className="text-slate-600">
-            You have {savedJobs.size} saved {savedJobs.size === 1 ? 'job' : 'jobs'}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-1">
+                Saved Jobs
+              </h1>
+              <p className="text-slate-600">
+                {savedJobs.size} {savedJobs.size === 1 ? 'job' : 'jobs'} saved
+              </p>
+            </div>
+
+            {filteredSavedJobs.length > 0 && (
+              <Link
+                to="/browse"
+                className="px-6 py-2.5 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors inline-flex items-center gap-2"
+              >
+                <Briefcase className="h-4 w-4" />
+                Browse More Jobs
+              </Link>
+            )}
+          </div>
         </div>
+
+        {/* Recently Viewed Jobs */}
+        <RecentlyViewed />
 
         {/* Saved Jobs List */}
         {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-            <p className="text-slate-600">Loading your saved jobs...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {[...Array(8)].map((_, i) => (
+              <JobCardSkeleton key={i} />
+            ))}
           </div>
         ) : filteredSavedJobs.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
-            <Heart className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">No saved jobs yet</h3>
+          <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
+            <Heart className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-slate-900 mb-2">No saved jobs yet</h3>
             <p className="text-slate-600 mb-6">
-              Start browsing and save jobs you're interested in
+              Browse jobs and save the ones you like
             </p>
             <Link
               to="/browse"
-              className="inline-flex items-center space-x-2 bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors"
+              className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors"
             >
               <Briefcase className="h-5 w-5" />
-              <span>Browse Jobs</span>
+              Browse Jobs
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredSavedJobs.map((item: any, index: number) => {
               const job = parseData(item.data)
               if (!job) return null
@@ -133,16 +254,17 @@ export default function SavedJobs() {
                 return (
                   <div
                     key={index}
-                    className="group bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-teal-200 flex flex-col"
+                    className="group bg-white rounded-xl p-5 hover:shadow-lg transition-all duration-200 border border-slate-200 hover:border-slate-300 flex flex-col"
                   >
-                    {/* Company Logo & Save Button */}
+                    {/* Header - Company Logo & Unsave Button */}
                     <div className="flex items-start justify-between mb-4">
-                      <div className="h-14 w-14 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                        <Building2 className="h-7 w-7 text-teal-600" />
+                      <div className="h-12 w-12 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Building2 className="h-6 w-6 text-slate-600" />
                       </div>
+
                       <button
-                        onClick={() => toggleSaveJob(jobKey)}
-                        className="p-2 hover:bg-red-50 rounded-full transition-all"
+                        onClick={() => toggleSaveJob(jobKey, job.title)}
+                        className="p-2 hover:bg-slate-100 rounded-lg transition-all"
                         title="Remove from saved"
                       >
                         <Heart className="h-5 w-5 fill-red-500 text-red-500" />
@@ -150,53 +272,52 @@ export default function SavedJobs() {
                     </div>
 
                     {/* Job Title */}
-                    <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-teal-600 transition-colors line-clamp-2">
+                    <h3 className="text-base font-bold text-slate-900 mb-1 line-clamp-2">
                       {job.title || 'No Title'}
                     </h3>
 
                     {/* Company Name */}
-                    <p className="text-sm font-medium text-slate-700 mb-3">{job.company || 'Company'}</p>
+                    <p className="text-sm text-slate-600 mb-3">{job.company || 'Company'}</p>
 
-                    {/* Location */}
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
-                      <MapPin className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate">{job.location || 'Remote'}</span>
+                    {/* Location & Type */}
+                    <div className="flex items-center gap-3 text-xs text-slate-500 mb-4">
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5" />
+                        <span className="truncate">{job.location || 'Remote'}</span>
+                      </div>
+                      {job.type && (
+                        <>
+                          <span>•</span>
+                          <span>{job.type}</span>
+                        </>
+                      )}
                     </div>
 
                     {/* Description */}
                     {job.description && (
-                      <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-3 flex-1">
-                        {cleanDescription(job.description, 200)}
+                      <p className="text-slate-600 text-sm leading-relaxed mb-4 line-clamp-2 flex-1">
+                        {cleanDescription(job.description, 150)}
                       </p>
                     )}
 
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {job.type && (
-                        <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">
-                          {job.type}
-                        </span>
-                      )}
-                      {job.salary && job.salary !== 'Not specified' && (
-                        <span className="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold flex items-center gap-1">
-                          <DollarSign className="h-3 w-3" />
+                    {/* Salary */}
+                    {job.salary && job.salary !== 'Not specified' && (
+                      <div className="mb-4">
+                        <span className="text-sm font-semibold text-emerald-700">
                           {job.salary}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
-                    {/* Footer - Source & Apply Button */}
-                    <div className="pt-4 border-t border-slate-100 mt-auto">
-                      {job.source && (
-                        <p className="text-xs text-slate-400 mb-3">via {job.source}</p>
-                      )}
+                    {/* Footer */}
+                    <div className="flex gap-2 mt-auto pt-4 border-t border-slate-100">
                       <a
                         href={job.url || item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-4 py-3 rounded-xl font-semibold hover:shadow-lg hover:-translate-y-0.5 transition-all text-sm"
+                        className="flex-1 inline-flex items-center justify-center gap-2 bg-teal-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-teal-700 transition-colors text-sm"
                       >
-                        <span>Apply Now</span>
+                        Apply
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </div>
@@ -205,7 +326,43 @@ export default function SavedJobs() {
             })}
           </div>
         )}
+
+        {/* Infinite Scroll Loading Indicator */}
+        {!isLoading && filteredSavedJobs.length > 0 && (
+          <>
+            {isLoadingMore && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
+                {[...Array(8)].map((_, i) => (
+                  <JobCardSkeleton key={`loading-${i}`} />
+                ))}
+              </div>
+            )}
+            
+            {/* Intersection Observer Sentinel */}
+            <div ref={sentinelRef} className="h-20 flex items-center justify-center">
+              {hasMoreJobs && !isLoadingMore && (
+                <p className="text-sm text-slate-500 dark:text-slate-400">Scroll for more jobs...</p>
+              )}
+              {!hasMoreJobs && filteredSavedJobs.length > 20 && (
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full">
+                    <CheckCircle2 className="h-4 w-4 text-teal-600" />
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      You've seen all {allSavedJobs.length} saved jobs
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
+
+      {/* Exit Intent Modal */}
+      <ExitIntentModal 
+        isOpen={showExitIntent} 
+        onClose={() => setShowExitIntent(false)} 
+      />
     </div>
   )
 }
