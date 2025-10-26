@@ -1,12 +1,12 @@
 [phases.setup]
-nixPkgs = ["nodejs-18_x", "chromium"]
+nixPkgs = ["nodejs-18_x"]
 
 [phases.install]
-cmds = ["cd server && npm ci"]
+cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["cd server && npm run build", "cd server && npx prisma generate"]
+cmds = ["npm run build", "npx prisma generate"]
 
 [start]
-cmd = "cd server && npm start"
+cmd = "npm start"
 

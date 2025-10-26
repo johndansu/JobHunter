@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+*/node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+server/prisma/dev.db
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Client folder (not needed for backend)
+client/
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+__tests__/
+coverage/
+
+# Misc
+.cache/
+tmp/
+temp/
+scraped_data/
+data/
+
