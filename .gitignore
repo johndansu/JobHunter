@@ -109,3 +109,7 @@ Thumbs.db
 # Scraped data
 scraped_data/
 data/
+
+# Deployment documentation
+DEPLOYMENT.md
+VERCEL-QUICKSTART.md

@@ -430,26 +430,19 @@ Full API documentation available at: `/api/docs` (when server is running)
 
 ## 🚢 Deployment
 
-### Frontend (Vercel/Netlify)
+**📖 See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.**
 
-1. Build the client:
-   ```bash
-   cd client
-   npm run build
-   ```
+### Quick Start
 
-2. Deploy the `client/dist` folder to your hosting provider
+**Frontend (Vercel)** ✅ Ready to deploy!
+- Push to GitHub and import in Vercel
+- Set `VITE_API_URL` environment variable
+- Automatic builds on push
 
-### Backend (Railway/Render/Heroku)
-
-1. Update `DATABASE_URL` to PostgreSQL connection string
-2. Build the server:
-   ```bash
-   cd server
-   npm run build
-   ```
-
-3. Deploy with your provider's CLI or connect via Git
+**Backend (Railway/Render/Heroku)**
+- Deploy backend separately (includes Puppeteer, needs more resources)
+- Switch from SQLite to PostgreSQL
+- See full guide in [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ### Docker (Coming Soon)
 ```bash
