@@ -351,30 +351,38 @@ export class ScrapingService {
       await page.setViewport({ width, height })
 
       // Override navigator properties to avoid detection
+      // @ts-ignore - Browser context code
       await page.evaluateOnNewDocument(() => {
         // Override the navigator.webdriver property
+        // @ts-ignore
         Object.defineProperty(navigator, 'webdriver', {
           get: () => undefined
         })
 
         // Override plugins and mimeTypes
+        // @ts-ignore
         Object.defineProperty(navigator, 'plugins', {
           get: () => [1, 2, 3, 4, 5]
         })
 
+        // @ts-ignore
         Object.defineProperty(navigator, 'languages', {
           get: () => ['en-US', 'en']
         })
 
         // Chrome runtime
+        // @ts-ignore
         (window as any).chrome = {
           runtime: {}
         }
 
         // Permissions
+        // @ts-ignore
         const originalQuery = window.navigator.permissions.query;
+        // @ts-ignore
         (window.navigator.permissions as any).query = (parameters: any) => (
           parameters.name === 'notifications' ?
+            // @ts-ignore
             Promise.resolve({ state: Notification.permission as any }) :
             originalQuery(parameters)
         )
