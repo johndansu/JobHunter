@@ -4,6 +4,8 @@ interface Job {
   location?: string
   type?: string
   description?: string
+  url: string
+  salary?: string
 }
 
 // Extract keywords from text
