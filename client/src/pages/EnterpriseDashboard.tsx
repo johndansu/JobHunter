@@ -22,7 +22,8 @@ import {
   MoreVertical,
   RefreshCw,
   LogOut,
-  User
+  User,
+  Users
 } from 'lucide-react'
 import { jobService } from '@/services/jobService'
 import { dataService } from '@/services/dataService'
@@ -161,6 +162,7 @@ const EnterpriseDashboard = () => {
               <Link to="/jobs" className="text-slate-600 hover:text-slate-900 font-medium">Job Searches</Link>
               <Link to="/data" className="text-slate-600 hover:text-slate-900 font-medium">Results</Link>
               <Link to="/analytics" className="text-slate-600 hover:text-slate-900 font-medium">Analytics</Link>
+              <Link to="/users" className="text-slate-600 hover:text-slate-900 font-medium">Users</Link>
               <Link to="/settings" className="text-slate-600 hover:text-slate-900 font-medium">Settings</Link>
               
               <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-slate-200">
@@ -300,6 +302,10 @@ const EnterpriseDashboard = () => {
                 <Link to="/analytics" className="btn btn-outline w-full justify-start">
                   <BarChart3 className="h-4 w-4 mr-2" />
                   View Analytics
+                </Link>
+                <Link to="/users" className="btn btn-outline w-full justify-start">
+                  <Users className="h-4 w-4 mr-2" />
+                  Manage Users
                 </Link>
                 <Link to="/settings" className="btn btn-outline w-full justify-start">
                   <Settings className="h-4 w-4 mr-2" />
