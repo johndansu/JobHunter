@@ -208,14 +208,6 @@ export default function JobBoardLanding() {
                     </button>
                 </>
               )}
-                {!user && (
-                  <Link 
-                    to="/login"
-                    className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-medium"
-                  >
-                    Login
-                  </Link>
-                )}
               </div>
             </nav>
 
@@ -225,7 +217,7 @@ export default function JobBoardLanding() {
                   to="/login" 
                   className="px-5 py-2.5 text-slate-700 hover:text-slate-900 dark:text-slate-100 font-medium transition-colors"
                 >
-                  Sign In
+                  Login
                 </Link>
                 <Link 
                   to="/register" 
