@@ -519,23 +519,39 @@ export default function BrowseJobs() {
             </div>
             <div className="flex flex-wrap gap-2">
               {[
-                { label: 'Remote', type: 'workMode', value: 'remote' },
-                { label: 'Full-time', type: 'jobType', value: 'full-time' },
-                { label: 'Part-time', type: 'jobType', value: 'part-time' },
-                { label: 'Contract', type: 'jobType', value: 'contract' },
-                { label: '$100k+', type: 'minSalary', value: '100000' },
-                { label: 'Entry Level', type: 'experienceLevel', value: 'entry' },
-                { label: 'Senior', type: 'experienceLevel', value: 'senior' }
+                { label: 'Remote', type: 'workMode' as const, value: 'Remote' },
+                { label: 'Full-time', type: 'jobTypes' as const, value: 'Full-time' },
+                { label: 'Part-time', type: 'jobTypes' as const, value: 'Part-time' },
+                { label: 'Contract', type: 'jobTypes' as const, value: 'Contract' },
+                { label: '$100k+', type: 'salary' as const, value: 100000 },
+                { label: 'Entry Level', type: 'experienceLevel' as const, value: 'Entry Level' },
+                { label: 'Senior Level', type: 'experienceLevel' as const, value: 'Senior Level' }
               ].map((filter, index) => {
-                const isActive = activeFilters[filter.type as keyof JobFiltersState] === filter.value
+                const isActive = filter.type === 'salary' 
+                  ? activeFilters.salaryRange[0] >= 100000
+                  : (activeFilters[filter.type] as string[]).includes(filter.value as string)
+                
                 return (
                   <button
                     key={index}
                     onClick={() => {
-                      setActiveFilters(prev => ({
-                        ...prev,
-                        [filter.type]: isActive ? '' : filter.value
-                      }))
+                      if (filter.type === 'salary') {
+                        setActiveFilters(prev => ({
+                          ...prev,
+                          salaryRange: isActive ? [0, 300000] : [100000, 300000]
+                        }))
+                      } else {
+                        setActiveFilters(prev => {
+                          const currentArray = prev[filter.type] as string[]
+                          const newArray = isActive 
+                            ? currentArray.filter(v => v !== filter.value)
+                            : [...currentArray, filter.value as string]
+                          return {
+                            ...prev,
+                            [filter.type]: newArray
+                          }
+                        })
+                      }
                     }}
                     className={`px-4 py-2 border rounded-full text-sm font-medium transition-colors ${
                       isActive 
