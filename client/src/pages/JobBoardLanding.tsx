@@ -24,7 +24,8 @@ import {
   Rocket,
   Star,
   X,
-  Bookmark
+  Bookmark,
+  Filter
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { locationService } from '@/services/locationService'
