@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { authService } from '@/services/authService'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import Layout from '@/components/Layout'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
@@ -87,17 +88,20 @@ function App() {
 
   if (!user) {
     return (
-      <Routes>
-        <Route path="/" element={<JobBoardLanding />} />
-        <Route path="/browse" element={<Navigate to="/login" replace />} />
-        <Route path="/saved" element={<Navigate to="/login" replace />} />
-        <Route path="/profile" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/auth-test" element={<AuthTest />} />
-        <Route path="/force-logout" element={<ForceLogout />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <>
+        <Routes>
+          <Route path="/" element={<JobBoardLanding />} />
+          <Route path="/browse" element={<Navigate to="/login" replace />} />
+          <Route path="/saved" element={<Navigate to="/login" replace />} />
+          <Route path="/profile" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/auth-test" element={<AuthTest />} />
+          <Route path="/force-logout" element={<ForceLogout />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        <SpeedInsights />
+      </>
     )
   }
 
@@ -107,32 +111,38 @@ function App() {
   if (isAdmin) {
     // Admin gets dashboard theme
     return (
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<EnterpriseDashboard />} />
-        <Route path="/jobs" element={<EnterpriseJobs />} />
-        <Route path="/jobs/:id" element={<EnterpriseJobDetails />} />
-        <Route path="/jobs/create" element={<EnterpriseCreateJob />} />
-        <Route path="/data" element={<EnterpriseData />} />
-        <Route path="/analytics" element={<EnterpriseAnalytics />} />
-        <Route path="/settings" element={<EnterpriseSettings />} />
-        <Route path="/test" element={<Layout><TestScraping /></Layout>} />
-        <Route path="/profile" element={<Layout><Profile /></Layout>} />
-        <Route path="/auth-test" element={<AuthTest />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+      <>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<EnterpriseDashboard />} />
+          <Route path="/jobs" element={<EnterpriseJobs />} />
+          <Route path="/jobs/:id" element={<EnterpriseJobDetails />} />
+          <Route path="/jobs/create" element={<EnterpriseCreateJob />} />
+          <Route path="/data" element={<EnterpriseData />} />
+          <Route path="/analytics" element={<EnterpriseAnalytics />} />
+          <Route path="/settings" element={<EnterpriseSettings />} />
+          <Route path="/test" element={<Layout><TestScraping /></Layout>} />
+          <Route path="/profile" element={<Layout><Profile /></Layout>} />
+          <Route path="/auth-test" element={<AuthTest />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+        <SpeedInsights />
+      </>
     )
   }
 
   // Regular users get simple job board theme
   return (
-    <Routes>
-      <Route path="/" element={<JobBoardLanding />} />
-      <Route path="/browse" element={<BrowseJobs />} />
-      <Route path="/saved" element={<SavedJobs />} />
-      <Route path="/profile" element={<Layout><Profile /></Layout>} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<JobBoardLanding />} />
+        <Route path="/browse" element={<BrowseJobs />} />
+        <Route path="/saved" element={<SavedJobs />} />
+        <Route path="/profile" element={<Layout><Profile /></Layout>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <SpeedInsights />
+    </>
   )
 }
 
