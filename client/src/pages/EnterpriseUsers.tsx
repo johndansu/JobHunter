@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
-import { Users, Search, Filter, User, Mail, Calendar, Shield, CheckCircle, XCircle, Trash2, UserCog, Ban, CheckCheck } from 'lucide-react'
+import { Users, Search, Filter, User, Mail, Calendar, Shield, CheckCircle, XCircle, Trash2, UserCog, Ban, CheckCheck, Download } from 'lucide-react'
 import api from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
@@ -103,6 +103,47 @@ export default function EnterpriseUsers() {
     }
   }
 
+  // Export users to CSV
+  const exportToCSV = () => {
+    if (!data || data.length === 0) {
+      toast.error('No users to export')
+      return
+    }
+
+    // CSV headers
+    const headers = ['Username', 'Email', 'First Name', 'Last Name', 'Role', 'Status', 'Joined Date']
+    
+    // CSV rows
+    const rows = data.map((u: any) => [
+      u.username,
+      u.email,
+      u.firstName || '',
+      u.lastName || '',
+      u.role,
+      u.isActive ? 'Active' : 'Inactive',
+      new Date(u.createdAt).toLocaleDateString()
+    ])
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n')
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `users_export_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    toast.success(`Exported ${data.length} users to CSV`)
+  }
+
   // Don't render anything if not admin
   if (!user || user.role !== 'ADMIN') {
     return (
@@ -144,12 +185,22 @@ export default function EnterpriseUsers() {
                 </p>
               </div>
             </div>
-            <Link
-              to="/dashboard"
-              className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            >
-              Back to Dashboard
-            </Link>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={exportToCSV}
+                disabled={!data || data.length === 0}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </button>
+              <Link
+                to="/dashboard"
+                className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                Back to Dashboard
+              </Link>
+            </div>
           </div>
         </div>
       </header>
