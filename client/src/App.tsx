@@ -89,8 +89,9 @@ function App() {
     return (
       <Routes>
         <Route path="/" element={<JobBoardLanding />} />
-        <Route path="/browse" element={<BrowseJobs />} />
-        <Route path="/saved" element={<SavedJobs />} />
+        <Route path="/browse" element={<Navigate to="/login" replace />} />
+        <Route path="/saved" element={<Navigate to="/login" replace />} />
+        <Route path="/profile" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/auth-test" element={<AuthTest />} />
