@@ -85,12 +85,6 @@ const Landing = () => {
 
             <div className="flex items-center space-x-3">
               <ThemeSwitcher />
-              <Link 
-                to="/login" 
-                className="px-5 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-slate-100 dark:hover:text-slate-100 font-medium transition-colors"
-              >
-                Sign In
-              </Link>
               <Link
                 to="/register"
                 className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-200"
