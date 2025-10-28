@@ -308,19 +308,36 @@ export default function BrowseJobs() {
               <div className="h-10 w-10 bg-teal-600 rounded-lg flex items-center justify-center group-hover:bg-teal-700 transition-colors duration-200">
                 <Briefcase className="h-5 w-5 text-white" />
               </div>
-              <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              <span className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100">
                 Job<span className="text-teal-600">Hunter</span>
               </span>
             </Link>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="md:hidden p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
-              aria-label="Toggle menu"
-            >
-              {showMobileMenu ? <X className="h-6 w-6" /> : <Filter className="h-6 w-6" />}
-            </button>
+            {/* Mobile - Always show user info if logged in */}
+            <div className="md:hidden flex items-center gap-2">
+              {user && (
+                <>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate max-w-[100px]">
+                    {user.username}
+                  </span>
+                  <button 
+                    onClick={logout} 
+                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                    title="Logout"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
+                </>
+              )}
+              {/* Hamburger Menu Button */}
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative"
+                aria-label="Toggle menu"
+              >
+                <Filter className="h-6 w-6" />
+              </button>
+            </div>
 
             <nav className="hidden md:flex items-center space-x-1">
               <Link 
@@ -374,68 +391,46 @@ export default function BrowseJobs() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* Mobile Dropdown Menu */}
       {showMobileMenu && (
-        <div className="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 py-4 space-y-2">
+        <div className="md:hidden absolute top-20 right-4 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50">
+          <div className="p-3 space-y-1">
             <Link 
               to="/browse" 
               onClick={() => setShowMobileMenu(false)}
-              className="block px-4 py-3 text-white font-semibold bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors text-center"
+              className="block px-4 py-2.5 text-white font-semibold bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors text-center"
             >
               Browse Jobs
             </Link>
             <Link 
               to="/saved" 
               onClick={() => setShowMobileMenu(false)}
-              className="block px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors font-medium"
+              className="block px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors font-medium"
             >
               <div className="flex items-center justify-between">
                 <span>Saved Jobs</span>
-                <span className="bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 px-2 py-1 rounded-full text-sm font-semibold">
+                <span className="bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-xs font-semibold">
                   {savedJobs.size}
                 </span>
               </div>
             </Link>
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Theme</span>
-              <ThemeSwitcher />
-            </div>
             <div className="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
-              {user ? (
-                <>
-                  <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg mb-2">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold">
-                        {user.username.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="font-medium text-slate-900 dark:text-slate-100">{user.username}</p>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">{user.email}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      logout()
-                      setShowMobileMenu(false)
-                    }}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all font-medium"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Logout
-                  </button>
-                </>
-              ) : (
+              <div className="flex items-center justify-between px-4 py-2">
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Theme</span>
+                <ThemeSwitcher />
+              </div>
+            </div>
+            {!user && (
+              <div className="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
                 <Link 
                   to="/login"
                   onClick={() => setShowMobileMenu(false)}
-                  className="block px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-medium text-center"
+                  className="block px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-medium text-center"
                 >
                   Login
                 </Link>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}
