@@ -518,14 +518,35 @@ export default function BrowseJobs() {
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {['Remote', 'Full-time', 'Part-time', 'Contract', '$100k+', 'Entry Level', 'Senior'].map((filter, index) => (
-                <button
-                  key={index}
-                  className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm font-medium text-slate-700 hover:bg-teal-50 hover:border-teal-600 hover:text-teal-700 transition-colors"
-                >
-                  {filter}
-                </button>
-              ))}
+              {[
+                { label: 'Remote', type: 'workMode', value: 'remote' },
+                { label: 'Full-time', type: 'jobType', value: 'full-time' },
+                { label: 'Part-time', type: 'jobType', value: 'part-time' },
+                { label: 'Contract', type: 'jobType', value: 'contract' },
+                { label: '$100k+', type: 'minSalary', value: '100000' },
+                { label: 'Entry Level', type: 'experienceLevel', value: 'entry' },
+                { label: 'Senior', type: 'experienceLevel', value: 'senior' }
+              ].map((filter, index) => {
+                const isActive = activeFilters[filter.type as keyof JobFiltersState] === filter.value
+                return (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setActiveFilters(prev => ({
+                        ...prev,
+                        [filter.type]: isActive ? '' : filter.value
+                      }))
+                    }}
+                    className={`px-4 py-2 border rounded-full text-sm font-medium transition-colors ${
+                      isActive 
+                        ? 'bg-teal-600 border-teal-600 text-white hover:bg-teal-700' 
+                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-teal-50 hover:border-teal-600 hover:text-teal-700'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
