@@ -10,6 +10,53 @@ const router = Router();
 // Apply authentication to all routes
 router.use(authenticateToken);
 
+// Admin-only: Get all users
+router.get('/all', async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Check if user is admin
+    if (req.user?.role !== 'ADMIN') {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Unauthorized. Admin access required.'
+      };
+      res.status(403).json(response);
+      return;
+    }
+
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    const response: ApiResponse<any> = {
+      success: true,
+      data: users,
+      message: `Found ${users.length} users`
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error('Get all users error:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to fetch users'
+    };
+    res.status(500).json(response);
+  }
+});
+
 // Update profile schema
 const updateProfileSchema = z.object({
   firstName: z.string().optional(),

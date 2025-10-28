@@ -15,6 +15,7 @@ import EnterpriseCreateJob from '@/pages/EnterpriseCreateJob'
 import EnterpriseData from '@/pages/EnterpriseData'
 import EnterpriseAnalytics from '@/pages/EnterpriseAnalytics'
 import EnterpriseSettings from '@/pages/EnterpriseSettings'
+import EnterpriseUsers from '@/pages/EnterpriseUsers'
 
 // Job Board Pages (for regular users)
 import JobBoardLanding from '@/pages/JobBoardLanding'
@@ -120,6 +121,7 @@ function App() {
           <Route path="/jobs/create" element={<EnterpriseCreateJob />} />
           <Route path="/data" element={<EnterpriseData />} />
           <Route path="/analytics" element={<EnterpriseAnalytics />} />
+          <Route path="/users" element={<EnterpriseUsers />} />
           <Route path="/settings" element={<EnterpriseSettings />} />
           <Route path="/test" element={<Layout><TestScraping /></Layout>} />
           <Route path="/profile" element={<Layout><Profile /></Layout>} />
