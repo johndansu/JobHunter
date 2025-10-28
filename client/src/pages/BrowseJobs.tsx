@@ -70,6 +70,7 @@ export default function BrowseJobs() {
   const [visibleJobsCount, setVisibleJobsCount] = useState(20) // For infinite scroll
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [showExitIntent, setShowExitIntent] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [savedJobs, setSavedJobs] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('savedJobs')
     return saved ? new Set(JSON.parse(saved)) : new Set()
@@ -312,6 +313,15 @@ export default function BrowseJobs() {
               </span>
             </Link>
 
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="md:hidden p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+              aria-label="Toggle menu"
+            >
+              {showMobileMenu ? <X className="h-6 w-6" /> : <Filter className="h-6 w-6" />}
+            </button>
+
             <nav className="hidden md:flex items-center space-x-1">
               <Link 
                 to="/browse" 
@@ -363,6 +373,72 @@ export default function BrowseJobs() {
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu */}
+      {showMobileMenu && (
+        <div className="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 py-4 space-y-2">
+            <Link 
+              to="/browse" 
+              onClick={() => setShowMobileMenu(false)}
+              className="block px-4 py-3 text-white font-semibold bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors text-center"
+            >
+              Browse Jobs
+            </Link>
+            <Link 
+              to="/saved" 
+              onClick={() => setShowMobileMenu(false)}
+              className="block px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors font-medium"
+            >
+              <div className="flex items-center justify-between">
+                <span>Saved Jobs</span>
+                <span className="bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 px-2 py-1 rounded-full text-sm font-semibold">
+                  {savedJobs.size}
+                </span>
+              </div>
+            </Link>
+            <div className="flex items-center justify-between px-4 py-3">
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Theme</span>
+              <ThemeSwitcher />
+            </div>
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
+              {user ? (
+                <>
+                  <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900 dark:text-slate-100">{user.username}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{user.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      logout()
+                      setShowMobileMenu(false)
+                    }}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all font-medium"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link 
+                  to="/login"
+                  onClick={() => setShowMobileMenu(false)}
+                  className="block px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-medium text-center"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Page Header */}
