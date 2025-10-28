@@ -57,6 +57,66 @@ router.get('/all', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+// Admin-only: Delete user
+router.delete('/:userId', async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Check if user is admin
+    if (req.user?.role !== 'ADMIN') {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Unauthorized. Admin access required.'
+      };
+      res.status(403).json(response);
+      return;
+    }
+
+    const { userId } = req.params;
+
+    // Prevent admin from deleting themselves
+    if (req.user?.id === userId) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'You cannot delete your own account'
+      };
+      res.status(400).json(response);
+      return;
+    }
+
+    // Check if user exists
+    const userToDelete = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!userToDelete) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'User not found'
+      };
+      res.status(404).json(response);
+      return;
+    }
+
+    // Delete the user
+    await prisma.user.delete({
+      where: { id: userId }
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: `User ${userToDelete.username} deleted successfully`
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error('Delete user error:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to delete user'
+    };
+    res.status(500).json(response);
+  }
+});
+
 // Update profile schema
 const updateProfileSchema = z.object({
   firstName: z.string().optional(),

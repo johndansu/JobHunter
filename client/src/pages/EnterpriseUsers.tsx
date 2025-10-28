@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
-import { Users, Search, Filter, User, Mail, Calendar, Shield, CheckCircle, XCircle } from 'lucide-react'
+import { Users, Search, Filter, User, Mail, Calendar, Shield, CheckCircle, XCircle, Trash2 } from 'lucide-react'
 import api from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
+import toast from 'react-hot-toast'
 
 interface User {
   id: number
@@ -20,8 +21,10 @@ interface User {
 export default function EnterpriseUsers() {
   const { user } = useAuthStore()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'ADMIN' | 'USER'>('ALL')
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
 
   // Protect this page - only admins can access
   useEffect(() => {
@@ -38,6 +41,27 @@ export default function EnterpriseUsers() {
     },
     enabled: !!user && user.role === 'ADMIN' // Only fetch if user is admin
   })
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      await api.delete(`/users/${userId}`)
+    },
+    onSuccess: () => {
+      toast.success('User deleted successfully')
+      queryClient.invalidateQueries({ queryKey: ['all-users'] })
+      setUserToDelete(null)
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.error || 'Failed to delete user')
+    }
+  })
+
+  const handleDeleteUser = () => {
+    if (userToDelete) {
+      deleteUserMutation.mutate(userToDelete.id.toString())
+    }
+  }
 
   // Don't render anything if not admin
   if (!user || user.role !== 'ADMIN') {
@@ -158,6 +182,9 @@ export default function EnterpriseUsers() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Joined
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
@@ -218,6 +245,16 @@ export default function EnterpriseUsers() {
                           {new Date(user.createdAt).toLocaleDateString()}
                         </div>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => setUserToDelete(user)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors text-sm font-medium"
+                          title="Delete user"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -259,6 +296,48 @@ export default function EnterpriseUsers() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {userToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-red-100 dark:bg-red-900 rounded-full">
+                <Trash2 className="h-6 w-6 text-red-600 dark:text-red-300" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                  Delete User
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+            
+            <p className="text-slate-700 dark:text-slate-300 mb-6">
+              Are you sure you want to delete <strong>{userToDelete.username}</strong> ({userToDelete.email})?
+            </p>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setUserToDelete(null)}
+                className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors font-medium"
+                disabled={deleteUserMutation.isPending}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                disabled={deleteUserMutation.isPending}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleteUserMutation.isPending ? 'Deleting...' : 'Delete User'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
