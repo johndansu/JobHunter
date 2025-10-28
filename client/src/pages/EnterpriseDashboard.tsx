@@ -1,5 +1,5 @@
 ﻿import { Link } from 'react-router-dom'
-import { Users, Settings, LogOut, TrendingUp, UserPlus, Activity, Calendar } from 'lucide-react'
+import { Users, Settings, LogOut, TrendingUp, UserPlus, Activity, Calendar, BarChart3 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
@@ -36,6 +36,33 @@ const EnterpriseDashboard = () => {
     admins: users?.filter((u: any) => u.role === 'ADMIN').length || 0,
     recentRegistrations: users?.slice(0, 5) || []
   }
+
+  // Calculate registration trends (last 7 days)
+  const registrationTrends = () => {
+    if (!users) return []
+    
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date()
+      date.setDate(date.getDate() - (6 - i))
+      return date.toISOString().split('T')[0]
+    })
+
+    return last7Days.map(date => {
+      const count = users.filter((u: any) => {
+        const userDate = new Date(u.createdAt).toISOString().split('T')[0]
+        return userDate === date
+      }).length
+
+      return {
+        date,
+        count,
+        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      }
+    })
+  }
+
+  const trends = registrationTrends()
+  const maxCount = Math.max(...trends.map(t => t.count), 1)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 dark:from-slate-900 dark:to-slate-800">
@@ -125,6 +152,64 @@ const EnterpriseDashboard = () => {
               {isLoading ? '...' : stats.totalUsers - stats.admins}
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-400">Regular Users</div>
+          </div>
+        </div>
+
+        {/* Registration Trend Chart */}
+        <div className="mb-8 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+            <div className="flex items-center gap-3">
+              <BarChart3 className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+                  Registration Trends
+                </h2>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  New user signups over the last 7 days
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            {isLoading ? (
+              <div className="h-64 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {trends.map((trend, index) => (
+                  <div key={index} className="flex items-center gap-4">
+                    <div className="w-20 text-sm text-slate-600 dark:text-slate-400 font-medium">
+                      {trend.label}
+                    </div>
+                    <div className="flex-1">
+                      <div className="relative h-10 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden">
+                        <div
+                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg flex items-center justify-end px-3 transition-all duration-500"
+                          style={{ width: `${(trend.count / maxCount) * 100}%`, minWidth: trend.count > 0 ? '2rem' : '0' }}
+                        >
+                          {trend.count > 0 && (
+                            <span className="text-xs font-semibold text-white">
+                              {trend.count}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-12 text-right">
+                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                        {trend.count}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {!isLoading && trends.every(t => t.count === 0) && (
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+                No registrations in the last 7 days
+              </div>
+            )}
           </div>
         </div>
 
