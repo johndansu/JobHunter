@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Users, Search, Filter, User, Mail, Calendar, Shield, CheckCircle, XCircle } from 'lucide-react'
 import api from '@/services/api'
+import { useAuthStore } from '@/store/authStore'
 
 interface User {
   id: number
@@ -17,16 +18,38 @@ interface User {
 }
 
 export default function EnterpriseUsers() {
+  const { user } = useAuthStore()
+  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'ADMIN' | 'USER'>('ALL')
+
+  // Protect this page - only admins can access
+  useEffect(() => {
+    if (!user || user.role !== 'ADMIN') {
+      navigate('/', { replace: true })
+    }
+  }, [user, navigate])
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['all-users'],
     queryFn: async () => {
       const response = await api.get('/users/all')
       return response.data.data as User[]
-    }
+    },
+    enabled: !!user && user.role === 'ADMIN' // Only fetch if user is admin
   })
+
+  // Don't render anything if not admin
+  if (!user || user.role !== 'ADMIN') {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-400">Access Denied</p>
+        </div>
+      </div>
+    )
+  }
 
   const filteredUsers = data?.filter(user => {
     const matchesSearch = 
