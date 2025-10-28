@@ -345,17 +345,17 @@ export class JobApiService {
    */
   private async fetchJSearch(query: string, location: string): Promise<JobResult[]> {
     try {
-      // Using public GraphQL endpoint (no auth needed)
-      const response = await axios.post('https://jsearch.p.rapidapi.com/search', {
-        query: query || 'software developer',
-        page: 1,
-        num_pages: 1
-      }, {
+      // JSearch uses GET with query parameters
+      const response = await axios.get('https://jsearch.p.rapidapi.com/search', {
+        params: {
+          query: `${query} ${location}`.trim() || 'software developer',
+          page: '1',
+          num_pages: '1'
+        },
         timeout: 15000,
         headers: {
-          'Content-Type': 'application/json',
           'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
-          'X-RapidAPI-Key': process.env.RAPIDAPI_KEY || 'demo'
+          'X-RapidAPI-Key': process.env.RAPIDAPI_KEY || process.env.JSEARCH_API_KEY || 'demo'
         }
       })
 
@@ -431,11 +431,16 @@ export class JobApiService {
    */
   private async fetchJooble(query: string, location: string): Promise<JobResult[]> {
     try {
-      // Jooble has presence in Nigeria, Kenya, South Africa, Ghana, etc.
-      const response = await axios.post('https://jooble.org/api/' + (process.env.JOOBLE_API_KEY || 'demo'), {
-        keywords: query,
+      // Jooble API key in URL, body as JSON
+      const apiKey = process.env.JOOBLE_API_KEY
+      if (!apiKey || apiKey === 'demo') {
+        return []
+      }
+      
+      const response = await axios.post(`https://jooble.org/api/${apiKey}`, {
+        keywords: query || '',
         location: location || '',
-        page: 1
+        page: '1'
       }, {
         timeout: 15000,
         headers: {
