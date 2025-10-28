@@ -57,6 +57,127 @@ router.get('/all', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+// Admin-only: Toggle user active status
+router.patch('/:userId/toggle-active', async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Check if user is admin
+    if (req.user?.role !== 'ADMIN') {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Unauthorized. Admin access required.'
+      };
+      res.status(403).json(response);
+      return;
+    }
+
+    const { userId } = req.params;
+
+    // Prevent admin from deactivating themselves
+    if (req.user?.id === userId) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'You cannot deactivate your own account'
+      };
+      res.status(400).json(response);
+      return;
+    }
+
+    // Get current user
+    const userToUpdate = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!userToUpdate) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'User not found'
+      };
+      res.status(404).json(response);
+      return;
+    }
+
+    // Toggle active status
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { isActive: !userToUpdate.isActive }
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: `User ${updatedUser.isActive ? 'activated' : 'deactivated'} successfully`,
+      data: updatedUser
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error('Toggle active status error:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to update user status'
+    };
+    res.status(500).json(response);
+  }
+});
+
+// Admin-only: Change user role
+router.patch('/:userId/change-role', async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Check if user is admin
+    if (req.user?.role !== 'ADMIN') {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Unauthorized. Admin access required.'
+      };
+      res.status(403).json(response);
+      return;
+    }
+
+    const { userId } = req.params;
+    const { role } = req.body;
+
+    // Validate role
+    if (!role || !['ADMIN', 'USER'].includes(role)) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'Invalid role. Must be ADMIN or USER'
+      };
+      res.status(400).json(response);
+      return;
+    }
+
+    // Prevent admin from changing their own role
+    if (req.user?.id === userId) {
+      const response: ApiResponse = {
+        success: false,
+        error: 'You cannot change your own role'
+      };
+      res.status(400).json(response);
+      return;
+    }
+
+    // Update user role
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { role }
+    });
+
+    const response: ApiResponse = {
+      success: true,
+      message: `User role changed to ${role} successfully`,
+      data: updatedUser
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error('Change role error:', error);
+    const response: ApiResponse = {
+      success: false,
+      error: 'Failed to change user role'
+    };
+    res.status(500).json(response);
+  }
+});
+
 // Admin-only: Delete user
 router.delete('/:userId', async (req: Request, res: Response): Promise<void> => {
   try {
