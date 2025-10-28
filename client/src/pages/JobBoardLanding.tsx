@@ -37,6 +37,11 @@ export default function JobBoardLanding() {
   const [location, setLocation] = useState('')
   const [locationSuggestions, setLocationSuggestions] = useState<string[]>([])
   const [showLocationSuggestions, setShowLocationSuggestions] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [savedJobsCount] = useState(() => {
+    const saved = localStorage.getItem('savedJobs')
+    return saved ? JSON.parse(saved).length : 0
+  })
 
   // Debounced location search
   useEffect(() => {
@@ -160,10 +165,36 @@ export default function JobBoardLanding() {
               <div className="h-10 w-10 bg-teal-600 rounded-lg flex items-center justify-center group-hover:bg-teal-700 transition-colors duration-200">
                 <Briefcase className="h-5 w-5 text-white" />
               </div>
-              <span className="text-2xl font-bold text-slate-900 dark:text-slate-100 dark:text-slate-100">
+              <span className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 dark:text-slate-100">
               Job<span className="text-teal-600">Hunter</span>
               </span>
             </Link>
+
+            {/* Mobile - Always show user info if logged in */}
+            <div className="md:hidden flex items-center gap-2">
+              {user && (
+                <>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate max-w-[100px]">
+                    {user.username}
+                  </span>
+                  <button 
+                    onClick={logout} 
+                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                    title="Logout"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
+                </>
+              )}
+              {/* Hamburger Menu Button */}
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative"
+                aria-label="Toggle menu"
+              >
+                <Filter className="h-6 w-6" />
+              </button>
+            </div>
 
             <nav className="hidden md:flex items-center space-x-1">
               <Link 
@@ -212,7 +243,7 @@ export default function JobBoardLanding() {
             </nav>
 
             {!user && (
-              <div className="flex items-center space-x-3">
+              <div className="hidden md:flex items-center space-x-3">
                 <Link 
                   to="/login" 
                   className="px-5 py-2.5 text-slate-700 hover:text-slate-900 dark:text-slate-100 font-medium transition-colors"
@@ -230,6 +261,59 @@ export default function JobBoardLanding() {
           </div>
         </div>
       </header>
+
+      {/* Mobile Dropdown Menu */}
+      {showMobileMenu && (
+        <div className="md:hidden absolute top-20 right-4 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50">
+          <div className="p-3 space-y-1">
+            <Link 
+              to="/browse" 
+              onClick={() => setShowMobileMenu(false)}
+              className="block px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors font-medium"
+            >
+              Browse Jobs
+            </Link>
+            {user && (
+              <Link 
+                to="/saved" 
+                onClick={() => setShowMobileMenu(false)}
+                className="block px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors font-medium"
+              >
+                <div className="flex items-center justify-between">
+                  <span>Saved Jobs</span>
+                  <span className="bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full text-xs font-semibold">
+                    {savedJobsCount}
+                  </span>
+                </div>
+              </Link>
+            )}
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
+              <div className="flex items-center justify-between px-4 py-2">
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Theme</span>
+                <ThemeSwitcher />
+              </div>
+            </div>
+            {!user && (
+              <div className="border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
+                <Link 
+                  to="/login"
+                  onClick={() => setShowMobileMenu(false)}
+                  className="block px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors font-medium text-center"
+                >
+                  Login
+                </Link>
+                <Link 
+                  to="/register"
+                  onClick={() => setShowMobileMenu(false)}
+                  className="block px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors font-medium text-center mt-1"
+                >
+                  Get Started
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Hero Section - Premium & Bold */}
       <section className="relative bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-24 pb-20 overflow-hidden">
