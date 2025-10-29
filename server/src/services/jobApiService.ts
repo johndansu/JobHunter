@@ -113,7 +113,7 @@ export class JobApiService {
 
     try {
       // Fetch from multiple sources in parallel (including African sources)
-      const [remotive, adzuna, themuse, arbeitnow, jsearch, landing, joora, reed, africanjobs] = await Promise.allSettled([
+      const [remotive, adzuna, themuse, arbeitnow, jsearch, landing, joora, reed] = await Promise.allSettled([
         this.fetchRemotive(query),
         this.fetchAdzuna(query, location),
         this.fetchTheMuse(query, location),
@@ -121,8 +121,9 @@ export class JobApiService {
         this.fetchJSearch(query, location),
         this.fetchLandingJobs(query),
         this.fetchJooble(query, location), // Global including Africa
-        this.fetchReedCoUk(query, location), // International jobs
-        this.fetchAfricanJobs(query, location) // African-focused aggregator
+        this.fetchReedCoUk(query, location) // International jobs
+        // Disabled: Jobberman API returning 404
+        // this.fetchAfricanJobs(query, location)
       ])
 
       if (remotive.status === 'fulfilled') {
@@ -149,11 +150,8 @@ export class JobApiService {
       if (reed.status === 'fulfilled') {
         results.push(...reed.value)
       }
-      if (africanjobs.status === 'fulfilled') {
-        results.push(...africanjobs.value)
-      }
 
-      const successfulSources = [remotive, adzuna, themuse, arbeitnow, jsearch, landing, joora, reed, africanjobs].filter(r => r.status === 'fulfilled').length
+      const successfulSources = [remotive, adzuna, themuse, arbeitnow, jsearch, landing, joora, reed].filter(r => r.status === 'fulfilled').length
       console.log(`Found ${results.length} jobs from ${successfulSources} sources`)
       
       // Shuffle results to mix jobs from different sources
