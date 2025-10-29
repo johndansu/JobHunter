@@ -29,10 +29,16 @@ export default function AdminAnnouncements() {
 
   // Create/Update announcement mutation
   const saveMutation = useMutation({
-    mutationFn: (data: typeof formData) => 
-      editingId 
-        ? adminService.updateAnnouncement(editingId, data)
-        : adminService.createAnnouncement(data),
+    mutationFn: (data: typeof formData) => {
+      // Convert empty string targetRole to undefined for API
+      const apiData = {
+        ...data,
+        targetRole: data.targetRole === '' ? undefined : data.targetRole
+      }
+      return editingId 
+        ? adminService.updateAnnouncement(editingId, apiData)
+        : adminService.createAnnouncement(apiData)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements'] })
       toast.success(editingId ? 'Announcement updated' : 'Announcement created')
