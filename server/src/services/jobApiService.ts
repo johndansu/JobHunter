@@ -489,9 +489,9 @@ export class JobApiService {
       }
       
       const response = await axios.post(`https://jooble.org/api/${apiKey}`, {
-        keywords: query || '',
+        keywords: query || 'jobs',
         location: location || '',
-        page: '1'
+        page: 1 // Must be number, not string
       }, {
         timeout: 15000,
         headers: {
