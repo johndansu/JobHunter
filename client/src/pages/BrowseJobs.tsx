@@ -47,6 +47,7 @@ import { ShareJobModal } from '@/components/ShareJobModal'
 import { useSavedSearches } from '@/hooks/useSavedSearches'
 import { SavedSearches } from '@/components/SavedSearches'
 import { JobRecommendations } from '@/components/JobRecommendations'
+import AdSense from '@/components/AdSense'
 
 export default function BrowseJobs() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -670,6 +671,15 @@ export default function BrowseJobs() {
           </div>
         </div>
 
+        {/* Top Banner Ad */}
+        <div className="mb-6">
+          <AdSense 
+            adSlot="0000000000"
+            adFormat="horizontal"
+            className="min-h-[90px] bg-slate-50 dark:bg-slate-800/50 rounded-lg"
+          />
+        </div>
+
         {/* Job Listings */}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -701,12 +711,16 @@ export default function BrowseJobs() {
               // Use job.id if available (from API), otherwise construct a unique key
               const jobKey = job.id || `${job.title || 'untitled'}-${job.company || 'company'}-${job.source || 'unknown'}-${index}`
 
+              // Insert AdSense ad after every 8 jobs
+              const showAdAfter = (index + 1) % 8 === 0 && index > 0
+              
               return (
-                <div
-                  key={jobKey}
-                  className="group bg-white dark:bg-slate-800 rounded-lg p-5 hover:shadow-lg transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-teal-700 flex flex-col animate-fadeIn"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
+                <>
+                  <div
+                    key={jobKey}
+                    className="group bg-white dark:bg-slate-800 rounded-lg p-5 hover:shadow-lg transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-teal-700 flex flex-col animate-fadeIn"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
                   {/* Header - Company Logo & Actions */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="h-12 w-12 bg-teal-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center flex-shrink-0 border border-teal-100 dark:border-blue-800">
@@ -852,6 +866,18 @@ export default function BrowseJobs() {
                     </div>
                   </div>
                 </div>
+                
+                {/* AdSense Ad - appears after every 8 jobs */}
+                {showAdAfter && (
+                  <div key={`ad-${index}`} className="col-span-full my-4">
+                    <AdSense 
+                      adSlot="0000000000"
+                      adFormat="auto"
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                )}
+              </>
               )
             })}
           </div>
