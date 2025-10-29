@@ -282,14 +282,22 @@ export class JobApiService {
         : jobs
 
       return filteredJobs.slice(0, 15).map((job: any) => {
-        // The Muse landing_page URLs are often broken
-        // Best approach: Use their search with company name which works reliably
-        const companyName = job.company?.name || 'company'
-        const jobTitle = job.name || 'position'
+        // The Muse provides direct job URLs in the refs.landing_page field
+        // Format: https://www.themuse.com/jobs/[company-slug]/[job-title-slug]
+        let jobUrl = 'https://www.themuse.com/jobs'
         
-        // Use The Muse's search URL which is more reliable than direct job links
-        const searchQuery = encodeURIComponent(`${jobTitle} ${companyName}`)
-        const jobUrl = `https://www.themuse.com/search/jobs?search=${searchQuery}`
+        if (job.refs?.landing_page) {
+          // Use the direct landing page URL from API
+          jobUrl = job.refs.landing_page
+        } else if (job.id) {
+          // Fallback: construct URL using job ID
+          jobUrl = `https://www.themuse.com/jobs/${job.id}`
+        } else {
+          // Last resort: use company short_name and job name
+          const companySlug = job.company?.short_name || job.company?.name?.toLowerCase().replace(/\s+/g, '-') || 'company'
+          const jobSlug = job.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'job'
+          jobUrl = `https://www.themuse.com/jobs/${companySlug}/${jobSlug}`
+        }
         
         return {
           title: job.name,
