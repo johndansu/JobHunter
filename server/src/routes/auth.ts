@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { prisma } from '../utils/database';
 import { ApiResponse, LoginRequest, RegisterRequest, User } from '../types';
+import { trackActivity, trackFailedLogin } from '../middleware/tracking';
 
 const router = Router();
 
@@ -78,6 +79,9 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
       { expiresIn: '7d' }
     );
 
+    // Track registration activity
+    await trackActivity(user.id, 'register', 'user', user.id, { email, username }, req);
+
     const response: ApiResponse<{ user: User; token: string }> = {
       success: true,
       data: {
@@ -120,6 +124,9 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     });
 
     if (!user || !user.isActive) {
+      // Track failed login attempt
+      await trackFailedLogin(email, req.ip || 'unknown', req);
+      
       const response: ApiResponse = {
         success: false,
         error: 'Invalid credentials'
@@ -132,6 +139,9 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
+      // Track failed login attempt
+      await trackFailedLogin(email, req.ip || 'unknown', req);
+      
       const response: ApiResponse = {
         success: false,
         error: 'Invalid credentials'
@@ -146,6 +156,15 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
       process.env.JWT_SECRET as string,
       { expiresIn: '7d' }
     );
+
+    // Update last login timestamp
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    });
+
+    // Track successful login
+    await trackActivity(user.id, 'login', 'user', user.id, { email }, req);
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;

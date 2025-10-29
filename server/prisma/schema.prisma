@@ -21,10 +21,14 @@ model User {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  lastLoginAt DateTime?
+  lastActiveAt DateTime?
 
   // Relations
   jobs      Job[]
   sessions  Session[]
+  activityLogs ActivityLog[]
+  auditLogs AuditLog[]
 
   @@map("users")
 }
@@ -98,7 +102,196 @@ model ScrapedData {
   @@map("scraped_data")
 }
 
-// Enums are replaced with string constants in SQLite
+// ============================================
+// ADMIN PLATFORM MANAGEMENT MODELS
+// ============================================
+
+// Track all external API calls (JSearch, Jooble, African Jobs, etc.)
+model ApiLog {
+  id            String   @id @default(cuid())
+  provider      String   // "jsearch", "jooble", "african_jobs"
+  endpoint      String
+  method        String   @default("GET")
+  statusCode    Int?
+  success       Boolean
+  responseTime  Int?     // milliseconds
+  requestData   String?  // JSON string
+  responseData  String?  // JSON string (truncated)
+  errorMessage  String?
+  userId        String?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+
+  @@index([provider, createdAt])
+  @@index([success, createdAt])
+  @@index([userId])
+  @@map("api_logs")
+}
+
+// Track user activity (searches, page views, feature usage)
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String   // "search", "view_job", "save_job", "login", "logout", "update_profile"
+  entityType  String?  // "job", "search", "profile"
+  entityId    String?
+  metadata    String?  // JSON string with additional data
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@map("activity_logs")
+}
+
+// System metrics for monitoring
+model SystemMetric {
+  id          String   @id @default(cuid())
+  metricType  String   // "cpu_usage", "memory_usage", "db_connections", "response_time"
+  value       Float
+  unit        String   // "percent", "mb", "ms", "count"
+  metadata    String?  // JSON string
+  recordedAt  DateTime @default(now())
+
+  @@index([metricType, recordedAt])
+  @@map("system_metrics")
+}
+
+// Error logs for debugging
+model ErrorLog {
+  id          String   @id @default(cuid())
+  errorType   String   // "api_error", "server_error", "validation_error"
+  errorCode   String?
+  message     String
+  stack       String?
+  userId      String?
+  endpoint    String?
+  method      String?
+  requestData String?  // JSON string
+  ipAddress   String?
+  userAgent   String?
+  severity    String   @default("error") // "info", "warning", "error", "critical"
+  resolved    Boolean  @default(false)
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime @default(now())
+
+  @@index([errorType, createdAt])
+  @@index([severity, resolved])
+  @@map("error_logs")
+}
+
+// Platform announcements and notices
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  type        String   @default("info") // "info", "warning", "maintenance", "feature"
+  priority    String   @default("normal") // "low", "normal", "high", "critical"
+  targetRole  String?  // null = all users, "USER", "ADMIN"
+  isActive    Boolean  @default(true)
+  startDate   DateTime @default(now())
+  endDate     DateTime?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, startDate])
+  @@map("announcements")
+}
+
+// Feature flags for enabling/disabling features
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isEnabled   Boolean  @default(true)
+  rolloutPercent Int   @default(100) // 0-100 for gradual rollout
+  metadata    String?  // JSON string for additional config
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("feature_flags")
+}
+
+// Admin action audit log
+model AuditLog {
+  id          String   @id @default(cuid())
+  adminId     String
+  action      String   // "delete_user", "change_role", "toggle_active", "create_announcement"
+  targetType  String   // "user", "announcement", "feature_flag", "system"
+  targetId    String?
+  changes     String?  // JSON string with before/after values
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
+
+// Security events tracking
+model SecurityEvent {
+  id          String   @id @default(cuid())
+  eventType   String   // "failed_login", "suspicious_activity", "rate_limit_exceeded", "blocked_ip"
+  userId      String?
+  ipAddress   String
+  userAgent   String?
+  details     String?  // JSON string
+  severity    String   @default("medium") // "low", "medium", "high", "critical"
+  resolved    Boolean  @default(false)
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime @default(now())
+
+  @@index([eventType, createdAt])
+  @@index([severity, resolved])
+  @@index([ipAddress])
+  @@map("security_events")
+}
+
+// IP blocklist/whitelist
+model IpRule {
+  id          String   @id @default(cuid())
+  ipAddress   String   @unique
+  type        String   // "block", "whitelist"
+  reason      String?
+  createdBy   String
+  expiresAt   DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type, isActive])
+  @@map("ip_rules")
+}
+
+// System configuration
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedBy   String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@map("system_config")
+}
+
+// Enums are replaced with string constants
 // UserRole: "ADMIN" | "USER"
 // JobStatus: "PENDING" | "RUNNING" | "COMPLETED" | "FAILED" | "PAUSED" | "CANCELLED"
 // ExecutionStatus: "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED"
+// ActivityAction: "search" | "view_job" | "save_job" | "login" | "logout" | "update_profile"
+// ErrorSeverity: "info" | "warning" | "error" | "critical"
+// AnnouncementType: "info" | "warning" | "maintenance" | "feature"

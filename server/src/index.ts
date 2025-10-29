@@ -10,12 +10,14 @@ import { WebSocketServer } from 'ws';
 
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
+import { requestTracker, checkIpRules } from './middleware/tracking';
 import authRoutes from './routes/auth';
 import jobRoutes from './routes/jobs';
 import dataRoutes from './routes/data';
 import userRoutes from './routes/users';
 import locationRoutes from './routes/locations';
 import searchRoutes from './routes/search';
+import adminRoutes from './routes/admin';
 import { initializeDatabase } from './utils/database';
 import { setupWebSocket } from './utils/websocket';
 import { scrapingService } from './services/scrapingService';
@@ -90,6 +92,12 @@ app.use(compression());
 // Logging middleware
 app.use(morgan('combined'));
 
+// Tracking middleware (for analytics and monitoring)
+app.use(requestTracker);
+
+// IP blocking/whitelisting middleware
+app.use(checkIpRules);
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ 
@@ -108,6 +116,7 @@ app.use('/api/export', exportRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/search', searchRoutes); // Public job search
+app.use('/api/admin', adminRoutes); // Admin-only routes
 
 // Error handling middleware
 app.use(notFound);

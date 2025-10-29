@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { stripHtml, truncate } from '../utils/htmlCleaner'
+import { trackApiCall } from '../middleware/tracking'
 
 export interface JobResult {
   title: string
@@ -344,6 +345,7 @@ export class JobApiService {
    * Fetch jobs from JSearch (RapidAPI - Free tier available, aggregates from multiple sources)
    */
   private async fetchJSearch(query: string, location: string): Promise<JobResult[]> {
+    const startTime = Date.now()
     try {
       // JSearch uses GET with query parameters
       const response = await axios.get('https://jsearch.p.rapidapi.com/search', {
@@ -359,7 +361,18 @@ export class JobApiService {
         }
       })
 
+      const responseTime = Date.now() - startTime
       const jobs = response.data.data || []
+      
+      // Track successful API call
+      await trackApiCall(
+        'jsearch',
+        '/search',
+        true,
+        response.status,
+        responseTime
+      )
+
       return jobs.slice(0, 15).map((job: any) => ({
         title: job.job_title,
         company: job.employer_name,
@@ -371,8 +384,20 @@ export class JobApiService {
         source: 'JSearch',
         postedDate: job.job_posted_at_datetime_utc
       }))
-    } catch (error) {
-      console.log('JSearch API error (continuing):', (error as any).message)
+    } catch (error: any) {
+      const responseTime = Date.now() - startTime
+      console.log('JSearch API error (continuing):', error.message)
+      
+      // Track failed API call
+      await trackApiCall(
+        'jsearch',
+        '/search',
+        false,
+        error.response?.status,
+        responseTime,
+        error.message
+      )
+      
       return []
     }
   }
@@ -430,6 +455,7 @@ export class JobApiService {
    * Free API with registration
    */
   private async fetchJooble(query: string, location: string): Promise<JobResult[]> {
+    const startTime = Date.now()
     try {
       // Jooble API key in URL, body as JSON
       const apiKey = process.env.JOOBLE_API_KEY
@@ -448,7 +474,18 @@ export class JobApiService {
         }
       })
 
+      const responseTime = Date.now() - startTime
       const jobs = response.data.jobs || []
+      
+      // Track successful API call
+      await trackApiCall(
+        'jooble',
+        '/api',
+        true,
+        response.status,
+        responseTime
+      )
+
       return jobs.slice(0, 20).map((job: any) => ({
         title: job.title,
         company: job.company || 'Unknown',
@@ -460,8 +497,20 @@ export class JobApiService {
         source: 'Jooble',
         postedDate: job.updated
       }))
-    } catch (error) {
-      console.log('Jooble API error (continuing):', (error as any).message)
+    } catch (error: any) {
+      const responseTime = Date.now() - startTime
+      console.log('Jooble API error (continuing):', error.message)
+      
+      // Track failed API call
+      await trackApiCall(
+        'jooble',
+        '/api',
+        false,
+        error.response?.status,
+        responseTime,
+        error.message
+      )
+      
       return []
     }
   }
@@ -518,6 +567,7 @@ export class JobApiService {
    * Using their public RSS/API endpoints
    */
   private async fetchAfricanJobs(query: string, location: string): Promise<JobResult[]> {
+    const startTime = Date.now()
     try {
       // Check if location suggests African region
       const africanCountries = ['nigeria', 'kenya', 'ghana', 'south africa', 'egypt', 'morocco', 'tanzania', 'uganda', 'rwanda', 'lagos', 'nairobi', 'accra', 'cairo', 'johannesburg']
@@ -546,7 +596,18 @@ export class JobApiService {
         }
       })
 
+      const responseTime = Date.now() - startTime
       const jobs = response.data.jobs || response.data.data || []
+      
+      // Track successful API call
+      await trackApiCall(
+        'african_jobs',
+        '/api/csearch',
+        true,
+        response.status,
+        responseTime
+      )
+
       return jobs.slice(0, 20).map((job: any) => ({
         title: job.title || job.job_title,
         company: job.company || job.company_name || 'Unknown',
@@ -558,8 +619,20 @@ export class JobApiService {
         source: 'Jobberman Africa',
         postedDate: job.posted_date || job.created_at
       }))
-    } catch (error) {
-      console.log('African jobs API error (continuing):', (error as any).message)
+    } catch (error: any) {
+      const responseTime = Date.now() - startTime
+      console.log('African jobs API error (continuing):', error.message)
+      
+      // Track failed API call
+      await trackApiCall(
+        'african_jobs',
+        '/api/csearch',
+        false,
+        error.response?.status,
+        responseTime,
+        error.message
+      )
+      
       // No fallback - rely on other API sources for real job listings
       return []
     }
