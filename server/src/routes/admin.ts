@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express'
 import { z } from 'zod'
 import { authenticateToken, requireAdmin } from '../middleware/auth'
 import { platformAnalyticsService } from '../services/platformAnalyticsService'
+import { affiliateService } from '../services/affiliateService'
 import { prisma } from '../utils/database'
 
 const router = Router()
@@ -852,6 +853,32 @@ router.put('/config/:key', async (req: Request, res: Response) => {
     res.status(500).json({ 
       success: false,
       error: 'Failed to update system configuration' 
+    })
+  }
+})
+
+// ============================================
+// AFFILIATE REVENUE ANALYTICS
+// ============================================
+
+/**
+ * GET /api/admin/affiliate/analytics
+ * Get affiliate click and revenue analytics
+ */
+router.get('/affiliate/analytics', async (req: Request, res: Response) => {
+  try {
+    const timeRange = (req.query.timeRange as string) || '30d'
+    const analytics = await affiliateService.getClickAnalytics(timeRange)
+    
+    res.json({
+      success: true,
+      data: analytics
+    })
+  } catch (error) {
+    console.error('Affiliate analytics error:', error)
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch affiliate analytics'
     })
   }
 })

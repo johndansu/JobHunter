@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { stripHtml, truncate } from '../utils/htmlCleaner'
 import { trackApiCall } from '../middleware/tracking'
+import { affiliateService } from './affiliateService'
 
 export interface JobResult {
   id?: string // Unique identifier for the job
@@ -37,6 +38,13 @@ export class JobApiService {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
     }
     return shuffled
+  }
+
+  /**
+   * Wrap job URL with affiliate tracking
+   */
+  private wrapWithAffiliateLink(url: string, source: string, jobId?: string): string {
+    return affiliateService.wrapAffiliateUrl(url, source, jobId)
   }
 
   /**
@@ -189,13 +197,14 @@ export class JobApiService {
 
       const jobs = response.data.jobs || []
       return jobs.slice(0, 20).map((job: any) => ({
+        id: job.id?.toString(),
         title: job.title,
         company: job.company_name,
         location: 'Remote',
         salary: job.salary || 'Not specified',
         type: job.job_type || 'Full-time',
         description: truncate(stripHtml(job.description || 'No description'), 300),
-        url: job.url,
+        url: this.wrapWithAffiliateLink(job.url, 'Remotive', job.id?.toString()),
         source: 'Remotive',
         postedDate: job.publication_date
       }))
@@ -313,7 +322,7 @@ export class JobApiService {
           salary: 'Not specified',
           type: job.levels?.[0]?.name || 'Full-time',
           description: truncate(stripHtml(job.contents || 'No description'), 300),
-          url: jobUrl,
+          url: this.wrapWithAffiliateLink(jobUrl, 'The Muse', job.id),
           source: 'The Muse',
           postedDate: job.publication_date
         }
