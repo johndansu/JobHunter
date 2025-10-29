@@ -3,6 +3,7 @@ import { stripHtml, truncate } from '../utils/htmlCleaner'
 import { trackApiCall } from '../middleware/tracking'
 
 export interface JobResult {
+  id?: string // Unique identifier for the job
   title: string
   company: string
   location: string
@@ -281,7 +282,7 @@ export class JobApiService {
           })
         : jobs
 
-      return filteredJobs.slice(0, 15).map((job: any) => {
+      return filteredJobs.slice(0, 15).map((job: any, index: number) => {
         // The Muse provides direct job URLs in the refs.landing_page field
         // Format: https://www.themuse.com/jobs/[company-slug]/[job-title-slug]
         let jobUrl = 'https://www.themuse.com/jobs'
@@ -299,7 +300,13 @@ export class JobApiService {
           jobUrl = `https://www.themuse.com/jobs/${companySlug}/${jobSlug}`
         }
         
+        // Debug log to verify URL mapping
+        if (index === 0) {
+          console.log(`[The Muse] Sample job mapping: "${job.name}" → ${jobUrl}`)
+        }
+        
         return {
+          id: job.id || `themuse-${index}-${Date.now()}`, // Add unique ID
           title: job.name,
           company: job.company?.name || 'Unknown',
           location: job.locations?.[0]?.name || 'Flexible',

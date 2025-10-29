@@ -698,11 +698,12 @@ export default function BrowseJobs() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {displayJobs.map((job: any, index: number) => {
               if (!job) return null
-              const jobKey = `${job.title || 'untitled'}-${job.company || 'company'}-${index}`
+              // Use job.id if available (from API), otherwise construct a unique key
+              const jobKey = job.id || `${job.title || 'untitled'}-${job.company || 'company'}-${job.source || 'unknown'}-${index}`
 
               return (
                 <div
-                  key={index}
+                  key={jobKey}
                   className="group bg-white dark:bg-slate-800 rounded-lg p-5 hover:shadow-lg transition-all duration-200 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-teal-700 flex flex-col animate-fadeIn"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
@@ -818,6 +819,10 @@ export default function BrowseJobs() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => {
+                          // Debug log for The Muse jobs
+                          if (job.source === 'The Muse') {
+                            console.log(`[The Muse Click] Title: "${job.title}", URL: ${job.url}`)
+                          }
                           addRecentJob({
                             id: jobKey,
                             title: job.title || 'No Title',
