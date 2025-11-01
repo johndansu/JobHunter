@@ -455,28 +455,30 @@ export default function BrowseJobs() {
           />
         </Suspense>
 
-        {/* AI Job Recommendations - Only show if no search query for better performance */}
+        {/* AI Job Recommendations - Only show on desktop for better mobile performance */}
         {!searchQuery && !location && (
-          <Suspense fallback={null}>
-            <JobRecommendations
-              allJobs={jobs}
-              savedJobIds={savedJobs}
-              viewedJobs={recentJobs}
-              onSaveJob={toggleSaveJob}
-              onViewJob={(job) => {
-                const jobKey = `${job.title || 'untitled'}-${job.company || 'company'}`
-                addRecentJob({
-                  id: jobKey,
-                  title: job.title || 'No Title',
-                  company: job.company || 'Company',
-                  location: job.location || 'Remote',
-                  type: job.type,
-                  salary: job.salary,
-                  url: job.url
-                })
-              }}
-            />
-          </Suspense>
+          <div className="hidden md:block">
+            <Suspense fallback={null}>
+              <JobRecommendations
+                allJobs={jobs}
+                savedJobIds={savedJobs}
+                viewedJobs={recentJobs}
+                onSaveJob={toggleSaveJob}
+                onViewJob={(job) => {
+                  const jobKey = `${job.title || 'untitled'}-${job.company || 'company'}`
+                  addRecentJob({
+                    id: jobKey,
+                    title: job.title || 'No Title',
+                    company: job.company || 'Company',
+                    location: job.location || 'Remote',
+                    type: job.type,
+                    salary: job.salary,
+                    url: job.url
+                  })
+                }}
+              />
+            </Suspense>
+          </div>
         )}
 
         {/* Professional Search Bar */}
