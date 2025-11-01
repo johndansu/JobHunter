@@ -937,24 +937,24 @@ export default function BrowseJobs() {
 
       {/* Floating Compare Bar */}
       {compareCount > 0 && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 animate-slideUp">
-          <div className="bg-teal-600 text-white rounded-lg shadow-xl px-6 py-4 flex items-center gap-4 border border-teal-500">
+        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-auto md:bottom-6 md:left-1/2 md:transform md:-translate-x-1/2 z-50 animate-slideUp md:max-w-md">
+          <div className="bg-teal-600 text-white rounded-lg shadow-xl px-4 md:px-6 py-3 md:py-4 flex items-center gap-3 md:gap-4 border border-teal-500">
             <div className="flex items-center gap-2">
               <GitCompare className="h-5 w-5" />
-              <span className="font-semibold">
-                {compareCount} {compareCount === 1 ? 'job' : 'jobs'} selected
+              <span className="font-semibold text-sm md:text-base">
+                {compareCount} {compareCount === 1 ? 'job' : 'jobs'}
               </span>
             </div>
-            <div className="h-6 w-px bg-white/30" />
+            <div className="h-6 w-px bg-white/30 hidden md:block" />
             <button
               onClick={() => setShowCompareModal(true)}
-              className="px-4 py-2 bg-white text-teal-600 hover:bg-teal-50 rounded-lg font-semibold transition-colors"
+              className="px-3 md:px-4 py-2 bg-white text-teal-600 hover:bg-teal-50 rounded-lg font-semibold transition-colors text-sm md:text-base whitespace-nowrap"
             >
               Compare Now
             </button>
             <button
               onClick={clearCompare}
-              className="p-2 hover:bg-teal-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-teal-700 rounded-lg transition-colors ml-auto md:ml-0"
               title="Clear all"
             >
               <X className="h-4 w-4" />
