@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { 
@@ -37,18 +37,20 @@ import { celebrate, getMilestone } from '@/utils/confetti'
 import { JobCardSkeleton, SearchBarSkeleton } from '@/components/SkeletonLoader'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { useExitIntent } from '@/hooks/useExitIntent'
-import { ExitIntentModal } from '@/components/ExitIntentModal'
-import { JobFilters, JobFiltersState, DEFAULT_FILTERS } from '@/components/JobFilters'
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed'
 import { useSearchHistory } from '@/hooks/useSearchHistory'
-import { SearchAutocomplete } from '@/components/SearchAutocomplete'
 import { useJobComparison } from '@/hooks/useJobComparison'
-import { JobComparisonModal } from '@/components/JobComparisonModal'
-import { ShareJobModal } from '@/components/ShareJobModal'
 import { useSavedSearches } from '@/hooks/useSavedSearches'
-import { SavedSearches } from '@/components/SavedSearches'
-import { JobRecommendations } from '@/components/JobRecommendations'
+import { JobFilters, JobFiltersState, DEFAULT_FILTERS } from '@/components/JobFilters'
 import AdSense from '@/components/AdSense'
+
+// Lazy load heavy components
+const ExitIntentModal = lazy(() => import('@/components/ExitIntentModal').then(m => ({ default: m.ExitIntentModal })))
+const JobRecommendations = lazy(() => import('@/components/JobRecommendations').then(m => ({ default: m.JobRecommendations })))
+const SavedSearches = lazy(() => import('@/components/SavedSearches').then(m => ({ default: m.SavedSearches })))
+const SearchAutocomplete = lazy(() => import('@/components/SearchAutocomplete').then(m => ({ default: m.SearchAutocomplete })))
+const JobComparisonModal = lazy(() => import('@/components/JobComparisonModal').then(m => ({ default: m.JobComparisonModal })))
+const ShareJobModal = lazy(() => import('@/components/ShareJobModal').then(m => ({ default: m.ShareJobModal })))
 
 export default function BrowseJobs() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -115,10 +117,10 @@ export default function BrowseJobs() {
   const { data: jobsData, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['browse-jobs', searchQuery, location, refreshKey],
     queryFn: () => searchService.searchJobs(searchQuery, location),
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 10 * 60 * 1000, // Cache for 10 minutes - much longer for better performance
     refetchOnWindowFocus: false,
     placeholderData: (previousData) => previousData, // Keep previous data while loading
-    gcTime: 10 * 60 * 1000 // Keep in cache for 10 minutes
+    gcTime: 30 * 60 * 1000 // Keep in cache for 30 minutes
   })
 
   const toggleSaveJob = (jobKey: string, jobTitle?: string) => {
@@ -441,35 +443,41 @@ export default function BrowseJobs() {
         </div>
 
         {/* Saved Searches */}
-        <SavedSearches
-          onApply={(query, loc, filters) => {
-            setSearchQuery(query)
-            setLocation(loc || '')
-            setActiveFilters(filters)
-            setCurrentPage(1)
-            showSuccess('Search applied!')
-          }}
-        />
+        <Suspense fallback={null}>
+          <SavedSearches
+            onApply={(query, loc, filters) => {
+              setSearchQuery(query)
+              setLocation(loc || '')
+              setActiveFilters(filters)
+              setCurrentPage(1)
+              showSuccess('Search applied!')
+            }}
+          />
+        </Suspense>
 
-        {/* AI Job Recommendations */}
-        <JobRecommendations
-          allJobs={jobs}
-          savedJobIds={savedJobs}
-          viewedJobs={recentJobs}
-          onSaveJob={toggleSaveJob}
-          onViewJob={(job) => {
-            const jobKey = `${job.title || 'untitled'}-${job.company || 'company'}`
-            addRecentJob({
-              id: jobKey,
-              title: job.title || 'No Title',
-              company: job.company || 'Company',
-              location: job.location || 'Remote',
-              type: job.type,
-              salary: job.salary,
-              url: job.url
-            })
-          }}
-        />
+        {/* AI Job Recommendations - Only show if no search query for better performance */}
+        {!searchQuery && !location && (
+          <Suspense fallback={null}>
+            <JobRecommendations
+              allJobs={jobs}
+              savedJobIds={savedJobs}
+              viewedJobs={recentJobs}
+              onSaveJob={toggleSaveJob}
+              onViewJob={(job) => {
+                const jobKey = `${job.title || 'untitled'}-${job.company || 'company'}`
+                addRecentJob({
+                  id: jobKey,
+                  title: job.title || 'No Title',
+                  company: job.company || 'Company',
+                  location: job.location || 'Remote',
+                  type: job.type,
+                  salary: job.salary,
+                  url: job.url
+                })
+              }}
+            />
+          </Suspense>
+        )}
 
         {/* Professional Search Bar */}
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 mb-8 border border-slate-200 dark:border-slate-700">
@@ -488,16 +496,20 @@ export default function BrowseJobs() {
                   placeholder="Job title, keywords, or company..."
                   className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 transition-all"
                 />
-                <SearchAutocomplete
-                  isOpen={showSearchAutocomplete}
-                  onClose={() => setShowSearchAutocomplete(false)}
-                  onSelect={(query, loc) => {
-                    setSearchQuery(query)
-                    if (loc) setLocation(loc)
-                    addSearch(query, loc)
-                  }}
-                  currentQuery={searchQuery}
-                />
+                {showSearchAutocomplete && (
+                  <Suspense fallback={null}>
+                    <SearchAutocomplete
+                      isOpen={showSearchAutocomplete}
+                      onClose={() => setShowSearchAutocomplete(false)}
+                      onSelect={(query, loc) => {
+                        setSearchQuery(query)
+                        if (loc) setLocation(loc)
+                        addSearch(query, loc)
+                      }}
+                      currentQuery={searchQuery}
+                    />
+                  </Suspense>
+                )}
               </div>
             </div>
 
@@ -960,10 +972,14 @@ export default function BrowseJobs() {
       </div>
 
       {/* Exit Intent Modal */}
-      <ExitIntentModal 
-        isOpen={showExitIntent} 
-        onClose={() => setShowExitIntent(false)} 
-      />
+      {showExitIntent && (
+        <Suspense fallback={null}>
+          <ExitIntentModal 
+            isOpen={showExitIntent} 
+            onClose={() => setShowExitIntent(false)} 
+          />
+        </Suspense>
+      )}
 
       {/* Job Filters Panel */}
       <JobFilters
@@ -1009,22 +1025,28 @@ export default function BrowseJobs() {
       )}
 
       {/* Job Comparison Modal */}
-      <JobComparisonModal
-        isOpen={showCompareModal}
-        onClose={() => setShowCompareModal(false)}
-        jobs={compareList}
-        onRemove={removeFromCompare}
-      />
+      {showCompareModal && (
+        <Suspense fallback={null}>
+          <JobComparisonModal
+            isOpen={showCompareModal}
+            onClose={() => setShowCompareModal(false)}
+            jobs={compareList}
+            onRemove={removeFromCompare}
+          />
+        </Suspense>
+      )}
 
       {/* Share Job Modal */}
       {shareJob && (
-        <ShareJobModal
-          isOpen={!!shareJob}
-          onClose={() => setShareJob(null)}
-          jobTitle={shareJob.title}
-          jobUrl={shareJob.url}
-          company={shareJob.company}
-        />
+        <Suspense fallback={null}>
+          <ShareJobModal
+            isOpen={!!shareJob}
+            onClose={() => setShareJob(null)}
+            jobTitle={shareJob.title}
+            jobUrl={shareJob.url}
+            company={shareJob.company}
+          />
+        </Suspense>
       )}
     </div>
   )
