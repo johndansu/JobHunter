@@ -9,20 +9,12 @@
   <!-- Background -->
   <rect width="100" height="100" rx="22" fill="url(#teal)"/>
   
-  <!-- Modern Briefcase -->
-  <g transform="translate(25, 35)">
-    <!-- Briefcase body -->
-    <rect x="0" y="8" width="50" height="30" rx="4" fill="white"/>
-    
-    <!-- Briefcase handle -->
-    <path d="M 20 8 L 20 0 Q 20 -8 25 -8 Q 30 -8 30 0 L 30 8" 
-          fill="none" 
-          stroke="white" 
-          stroke-width="4" 
-          stroke-linecap="round"
-          stroke-linejoin="round"/>
-    
-    <!-- Divider line -->
-    <line x1="0" y1="23" x2="50" y2="23" stroke="#14b8a6" stroke-width="2"/>
-  </g>
+  <!-- JH Text -->
+  <text x="50" y="65" 
+        font-family="Arial, sans-serif" 
+        font-size="52" 
+        font-weight="bold" 
+        fill="white" 
+        text-anchor="middle" 
+        dominant-baseline="middle">JH</text>
 </svg>
