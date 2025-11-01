@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { authService } from '@/services/authService'
 import { SpeedInsights } from '@vercel/speed-insights/react'
@@ -7,33 +7,43 @@ import Layout from '@/components/Layout'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 
-// Admin Dashboard Pages
-import EnterpriseDashboard from '@/pages/EnterpriseDashboard'
-import EnterpriseJobs from '@/pages/EnterpriseJobs'
-import EnterpriseJobDetails from '@/pages/EnterpriseJobDetails'
-import EnterpriseCreateJob from '@/pages/EnterpriseCreateJob'
-import EnterpriseData from '@/pages/EnterpriseData'
-import EnterpriseAnalytics from '@/pages/EnterpriseAnalytics'
-import EnterpriseSettings from '@/pages/EnterpriseSettings'
-import EnterpriseUsers from '@/pages/EnterpriseUsers'
-import AdminAnalytics from '@/pages/AdminAnalytics'
-import AdminHealth from '@/pages/AdminHealth'
-import AdminSecurity from '@/pages/AdminSecurity'
-import AdminAnnouncements from '@/pages/AdminAnnouncements'
-
-// Job Board Pages (for regular users)
+// Critical pages - load immediately
 import JobBoardLanding from '@/pages/JobBoardLanding'
 import BrowseJobs from '@/pages/BrowseJobs'
 import SavedJobs from '@/pages/SavedJobs'
 
-// Legacy pages
-import Jobs from '@/pages/Jobs'
-import JobDetails from '@/pages/JobDetails'
-import ProfessionalCreateJob from '@/pages/ProfessionalCreateJob'
-import Data from '@/pages/Data'
-import Profile from '@/pages/Profile'
-import TestScraping from '@/pages/TestScraping'
-import AuthTest from '@/pages/AuthTest'
+// Lazy load admin pages (heavy with charts/analytics)
+const EnterpriseDashboard = lazy(() => import('@/pages/EnterpriseDashboard'))
+const EnterpriseJobs = lazy(() => import('@/pages/EnterpriseJobs'))
+const EnterpriseJobDetails = lazy(() => import('@/pages/EnterpriseJobDetails'))
+const EnterpriseCreateJob = lazy(() => import('@/pages/EnterpriseCreateJob'))
+const EnterpriseData = lazy(() => import('@/pages/EnterpriseData'))
+const EnterpriseAnalytics = lazy(() => import('@/pages/EnterpriseAnalytics'))
+const EnterpriseSettings = lazy(() => import('@/pages/EnterpriseSettings'))
+const EnterpriseUsers = lazy(() => import('@/pages/EnterpriseUsers'))
+const AdminAnalytics = lazy(() => import('@/pages/AdminAnalytics'))
+const AdminHealth = lazy(() => import('@/pages/AdminHealth'))
+const AdminSecurity = lazy(() => import('@/pages/AdminSecurity'))
+const AdminAnnouncements = lazy(() => import('@/pages/AdminAnnouncements'))
+
+// Lazy load legacy pages
+const Jobs = lazy(() => import('@/pages/Jobs'))
+const JobDetails = lazy(() => import('@/pages/JobDetails'))
+const ProfessionalCreateJob = lazy(() => import('@/pages/ProfessionalCreateJob'))
+const Data = lazy(() => import('@/pages/Data'))
+const Profile = lazy(() => import('@/pages/Profile'))
+const TestScraping = lazy(() => import('@/pages/TestScraping'))
+const AuthTest = lazy(() => import('@/pages/AuthTest'))
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+      <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+    </div>
+  </div>
+)
 
 // Temporary component to force logout and clear auth state
 const ForceLogout = () => {
@@ -117,25 +127,27 @@ function App() {
     // Admin gets dashboard theme
     return (
       <>
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<EnterpriseDashboard />} />
-          <Route path="/jobs" element={<EnterpriseJobs />} />
-          <Route path="/jobs/:id" element={<EnterpriseJobDetails />} />
-          <Route path="/jobs/create" element={<EnterpriseCreateJob />} />
-          <Route path="/data" element={<EnterpriseData />} />
-          <Route path="/analytics" element={<EnterpriseAnalytics />} />
-          <Route path="/users" element={<EnterpriseUsers />} />
-          <Route path="/settings" element={<EnterpriseSettings />} />
-          <Route path="/admin/analytics" element={<AdminAnalytics />} />
-          <Route path="/admin/health" element={<AdminHealth />} />
-          <Route path="/admin/security" element={<AdminSecurity />} />
-          <Route path="/admin/announcements" element={<AdminAnnouncements />} />
-          <Route path="/test" element={<Layout><TestScraping /></Layout>} />
-          <Route path="/profile" element={<Layout><Profile /></Layout>} />
-          <Route path="/auth-test" element={<AuthTest />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<EnterpriseDashboard />} />
+            <Route path="/jobs" element={<EnterpriseJobs />} />
+            <Route path="/jobs/:id" element={<EnterpriseJobDetails />} />
+            <Route path="/jobs/create" element={<EnterpriseCreateJob />} />
+            <Route path="/data" element={<EnterpriseData />} />
+            <Route path="/analytics" element={<EnterpriseAnalytics />} />
+            <Route path="/users" element={<EnterpriseUsers />} />
+            <Route path="/settings" element={<EnterpriseSettings />} />
+            <Route path="/admin/analytics" element={<AdminAnalytics />} />
+            <Route path="/admin/health" element={<AdminHealth />} />
+            <Route path="/admin/security" element={<AdminSecurity />} />
+            <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+            <Route path="/test" element={<Layout><TestScraping /></Layout>} />
+            <Route path="/profile" element={<Layout><Profile /></Layout>} />
+            <Route path="/auth-test" element={<AuthTest />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Suspense>
         <SpeedInsights />
       </>
     )

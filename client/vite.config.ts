@@ -30,5 +30,26 @@ export default defineConfig({
   define: {
     // Allow eval in development
     global: 'globalThis',
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split vendor libraries
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'query-vendor': ['@tanstack/react-query'],
+          'form-vendor': ['react-hook-form', 'zod', '@hookform/resolvers'],
+          'chart-vendor': ['chart.js', 'react-chartjs-2'],
+          'ui-vendor': ['framer-motion', 'lucide-react'],
+          // Split admin pages (heavy with charts)
+          'admin-pages': [
+            './src/pages/EnterpriseDashboard',
+            './src/pages/AdminAnalytics',
+            './src/pages/EnterpriseAnalytics',
+          ]
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
   }
 })
