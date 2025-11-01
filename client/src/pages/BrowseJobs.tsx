@@ -24,7 +24,9 @@ import {
   Plus,
   GitCompare,
   Share2,
-  Save
+  Save,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 import { searchService } from '@/services/searchService'
 import { locationService } from '@/services/locationService'
@@ -34,7 +36,6 @@ import { useToast } from '@/components/ToastContainer'
 import { celebrate, getMilestone } from '@/utils/confetti'
 import { JobCardSkeleton, SearchBarSkeleton } from '@/components/SkeletonLoader'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { useExitIntent } from '@/hooks/useExitIntent'
 import { ExitIntentModal } from '@/components/ExitIntentModal'
 import { JobFilters, JobFiltersState, DEFAULT_FILTERS } from '@/components/JobFilters'
@@ -68,8 +69,8 @@ export default function BrowseJobs() {
   const [shareJob, setShareJob] = useState<{ title: string; url: string; company: string } | null>(null)
   const [activeFilters, setActiveFilters] = useState<JobFiltersState>(DEFAULT_FILTERS)
   const [refreshKey, setRefreshKey] = useState(0) // For random refresh
-  const [visibleJobsCount, setVisibleJobsCount] = useState(20) // For infinite scroll
-  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const jobsPerPage = 20
   const [showExitIntent, setShowExitIntent] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [savedJobs, setSavedJobs] = useState<Set<string>>(() => {
@@ -261,8 +262,12 @@ export default function BrowseJobs() {
   const shuffledJobs = (!searchQuery && !location) ? shuffleArray(jobs) : jobs
   const filteredJobs = applyFilters(shuffledJobs)
   const allJobs = filteredJobs
-  const displayJobs = allJobs.slice(0, visibleJobsCount)
-  const hasMoreJobs = visibleJobsCount < allJobs.length
+  
+  // Pagination calculations
+  const totalPages = Math.ceil(allJobs.length / jobsPerPage)
+  const startIndex = (currentPage - 1) * jobsPerPage
+  const endIndex = startIndex + jobsPerPage
+  const displayJobs = allJobs.slice(startIndex, endIndex)
 
   // Count active filters
   const activeFilterCount = 
@@ -273,33 +278,19 @@ export default function BrowseJobs() {
 
   const handleRefresh = () => {
     setRefreshKey(prev => prev + 1) // Trigger new random shuffle
-    setVisibleJobsCount(20) // Reset to initial count
+    setCurrentPage(1) // Reset to first page
   }
 
-  // Infinite scroll - Load more jobs
-  const loadMoreJobs = () => {
-    if (!isLoadingMore && hasMoreJobs) {
-      setIsLoadingMore(true)
-      
-      // Simulate loading delay for smooth UX
-      setTimeout(() => {
-        setVisibleJobsCount(prev => Math.min(prev + 20, allJobs.length))
-        setIsLoadingMore(false)
-      }, 500)
-    }
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const sentinelRef = useInfiniteScroll({
-    onLoadMore: loadMoreJobs,
-    hasMore: hasMoreJobs,
-    isLoading: isLoadingMore,
-    threshold: 0.8
-  })
-
-  // Reset visible count when search changes
+  // Reset to first page when search/filters change
   useEffect(() => {
-    setVisibleJobsCount(20)
-  }, [searchQuery, location, refreshKey])
+    setCurrentPage(1)
+  }, [searchQuery, location, refreshKey, activeFilters])
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -396,7 +387,7 @@ export default function BrowseJobs() {
 
       {/* Mobile Dropdown Menu */}
       {showMobileMenu && (
-        <div className="md:hidden absolute top-20 right-4 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50">
+        <div className="md:hidden fixed top-20 right-4 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-[60]">
           <div className="p-3 space-y-1">
             <Link 
               to="/browse" 
@@ -455,7 +446,7 @@ export default function BrowseJobs() {
             setSearchQuery(query)
             setLocation(loc || '')
             setActiveFilters(filters)
-            setVisibleJobsCount(20)
+            setCurrentPage(1)
             showSuccess('Search applied!')
           }}
         />
@@ -522,11 +513,11 @@ export default function BrowseJobs() {
                   onChange={(e) => setLocation(e.target.value)}
                   onFocus={() => locationSuggestions.length > 0 && setShowLocationSuggestions(true)}
                   placeholder="City, state, or remote"
-                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-slate-900 placeholder:text-slate-400 transition-all"
+                  className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white dark:focus:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 transition-all"
                 />
                 {/* Location Suggestions Dropdown */}
                 {showLocationSuggestions && locationSuggestions.length > 0 && (
-                  <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto animate-slideDown">
+                  <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-60 overflow-y-auto animate-slideDown">
                     {locationSuggestions.map((suggestion, index) => (
                       <button
                         key={index}
@@ -535,10 +526,10 @@ export default function BrowseJobs() {
                           setLocation(suggestion)
                           setShowLocationSuggestions(false)
                         }}
-                        className="w-full text-left px-4 py-3 hover:bg-teal-50 transition-colors flex items-center space-x-2 first:rounded-t-xl last:rounded-b-xl"
+                        className="w-full text-left px-4 py-3 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors flex items-center space-x-2 first:rounded-t-xl last:rounded-b-xl"
                       >
                         <MapPin className="h-4 w-4 text-teal-600 flex-shrink-0" />
-                        <span className="text-sm text-slate-700 truncate">{suggestion}</span>
+                        <span className="text-sm text-slate-700 dark:text-slate-300 truncate">{suggestion}</span>
                       </button>
                     ))}
                   </div>
@@ -642,14 +633,14 @@ export default function BrowseJobs() {
         </div>
 
         {/* Results Header with Sorting */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 bg-white rounded-xl p-4 border border-slate-200">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-1">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">
               {displayJobs.length.toLocaleString()} Jobs Found
             </h2>
-            <p className="text-sm text-slate-600">
-              {searchQuery && <span>for "<strong className="text-slate-900">{searchQuery}</strong>"</span>}
-              {location && <span> in <strong className="text-slate-900">{location}</strong></span>}
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              {searchQuery && <span>for "<strong className="text-slate-900 dark:text-slate-100">{searchQuery}</strong>"</span>}
+              {location && <span> in <strong className="text-slate-900 dark:text-slate-100">{location}</strong></span>}
             </p>
           </div>
           
@@ -658,7 +649,7 @@ export default function BrowseJobs() {
               <button
                 onClick={handleRefresh}
                 disabled={isFetching}
-                className="flex items-center gap-2 px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">Refresh</span>
@@ -673,7 +664,7 @@ export default function BrowseJobs() {
               </div>
             )}
             
-            <select className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors bg-white">
+            <select className="px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors bg-white dark:bg-slate-800">
               <option>Most Relevant</option>
               <option>Most Recent</option>
               <option>Salary: High to Low</option>
@@ -894,34 +885,77 @@ export default function BrowseJobs() {
           </div>
         )}
 
-        {/* Infinite Scroll Loading Indicator */}
-        {!isLoading && displayJobs.length > 0 && (
-          <>
-            {isLoadingMore && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
-                {[...Array(8)].map((_, i) => (
-                  <JobCardSkeleton key={`loading-${i}`} />
-                ))}
-              </div>
-            )}
-            
-            {/* Intersection Observer Sentinel */}
-            <div ref={sentinelRef} className="h-20 flex items-center justify-center">
-              {hasMoreJobs && !isLoadingMore && (
-                <p className="text-sm text-slate-500 dark:text-slate-400">Scroll for more jobs...</p>
-              )}
-              {!hasMoreJobs && displayJobs.length > 20 && (
-                <div className="text-center py-8">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full">
-                    <CheckCircle2 className="h-4 w-4 text-teal-600" />
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      You've seen all {allJobs.length} jobs
-                    </span>
-                  </div>
-                </div>
-              )}
+        {/* Pagination Controls */}
+        {!isLoading && displayJobs.length > 0 && totalPages > 1 && (
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-slate-600 dark:text-slate-400">
+              Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{startIndex + 1}</span> to{' '}
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{Math.min(endIndex, allJobs.length)}</span> of{' '}
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{allJobs.length}</span> jobs
             </div>
-          </>
+            
+            <div className="flex items-center gap-1">
+              {/* Previous Button */}
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              
+              {/* Page Numbers */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum
+                  if (totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+                  
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-4 py-2 rounded-lg border transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-teal-600 border-teal-600 text-white'
+                          : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                })}
+              </div>
+              
+              {/* Next Button */}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Show end message if on last page */}
+        {!isLoading && displayJobs.length > 0 && currentPage === totalPages && totalPages > 1 && (
+          <div className="text-center py-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-full">
+              <CheckCircle2 className="h-4 w-4 text-teal-600" />
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                You've viewed all {allJobs.length} jobs
+              </span>
+            </div>
+          </div>
         )}
       </div>
 
@@ -938,11 +972,11 @@ export default function BrowseJobs() {
         filters={activeFilters}
         onFiltersChange={(newFilters) => {
           setActiveFilters(newFilters)
-          setVisibleJobsCount(20) // Reset pagination when filters change
+          setCurrentPage(1) // Reset pagination when filters change
         }}
         onClear={() => {
           setActiveFilters(DEFAULT_FILTERS)
-          setVisibleJobsCount(20)
+          setCurrentPage(1)
         }}
       />
 

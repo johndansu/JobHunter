@@ -265,7 +265,7 @@ export default function JobBoardLanding() {
 
       {/* Mobile Dropdown Menu */}
       {showMobileMenu && (
-        <div className="md:hidden absolute top-20 right-4 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50">
+        <div className="md:hidden fixed top-20 right-4 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-[60]">
           <div className="p-3 space-y-1">
             <Link 
               to="/browse" 
