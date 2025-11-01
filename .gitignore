@@ -76,7 +76,7 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
+# public  # Need to track favicon in client/public/
 
 # Storybook build outputs
 .out
