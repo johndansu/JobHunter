@@ -111,11 +111,13 @@ export default function BrowseJobs() {
   }, [location])
 
   // Fetch jobs directly from APIs, not from admin's database
-  const { data: jobsData, isLoading, refetch } = useQuery({
+  const { data: jobsData, isLoading, refetch, isFetching } = useQuery({
     queryKey: ['browse-jobs', searchQuery, location, refreshKey],
     queryFn: () => searchService.searchJobs(searchQuery, location),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    placeholderData: (previousData) => previousData, // Keep previous data while loading
+    gcTime: 10 * 60 * 1000 // Keep in cache for 10 minutes
   })
 
   const toggleSaveJob = (jobKey: string, jobTitle?: string) => {
@@ -655,11 +657,20 @@ export default function BrowseJobs() {
             {!searchQuery && !location && (
               <button
                 onClick={handleRefresh}
-                className="flex items-center gap-2 px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors font-medium"
+                disabled={isFetching}
+                className="flex items-center gap-2 px-4 py-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">Refresh</span>
               </button>
+            )}
+            
+            {/* Loading indicator for background refreshes */}
+            {isFetching && !isLoading && displayJobs.length > 0 && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-teal-50 dark:bg-teal-900/30 rounded-lg">
+                <RefreshCw className="h-3 w-3 animate-spin text-teal-600" />
+                <span className="text-xs text-teal-700 dark:text-teal-300 font-medium">Updating...</span>
+              </div>
             )}
             
             <select className="px-4 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors bg-white">
