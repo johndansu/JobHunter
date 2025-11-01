@@ -6,15 +6,12 @@
     </linearGradient>
   </defs>
   
-  <!-- Background -->
-  <rect width="100" height="100" rx="22" fill="url(#teal)"/>
-  
-  <!-- JH Text -->
+  <!-- JH Text in Teal -->
   <text x="50" y="65" 
         font-family="Arial, sans-serif" 
         font-size="52" 
         font-weight="bold" 
-        fill="white" 
+        fill="url(#teal)" 
         text-anchor="middle" 
         dominant-baseline="middle">JH</text>
 </svg>
