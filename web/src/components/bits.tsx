@@ -31,6 +31,29 @@ export function VerdictBadge({ verdict }: { verdict: VerdictKind }) {
   return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${v.cls}`}>{v.label}</span>;
 }
 
+const BAND: Record<string, { label: string; cls: string }> = {
+  strong: { label: "Strong fit", cls: "bg-good-soft text-good" },
+  good: { label: "Good fit", cls: "bg-accent-soft text-accent" },
+  stretch: { label: "Stretch", cls: "bg-warn-soft text-warn" },
+  unlikely: { label: "Unlikely", cls: "bg-line/60 text-muted" },
+};
+
+export function BandBadge({ band }: { band: string }) {
+  const b = BAND[band] ?? BAND.unlikely;
+  return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${b.cls}`}>{b.label}</span>;
+}
+
+export function AiModeNote() {
+  const on = process.env.AI_MODE === "on" && !!process.env.ANTHROPIC_API_KEY;
+  return (
+    <p className="rounded border border-line bg-surface px-3 py-2 text-xs text-muted">
+      {on
+        ? "AI mode is on, but AI features arrive in a later update, so everything below still runs on rules."
+        : "No-AI mode: everything here runs on rules on this computer. Your CV isn't sent anywhere."}
+    </p>
+  );
+}
+
 export function OverlapText({ overlap }: { overlap: { min: number; max: number; anchor: string } | null | undefined }) {
   if (!overlap) return null;
   const r = overlap.min === overlap.max ? `${overlap.min} h` : `${overlap.min}–${overlap.max} h`;

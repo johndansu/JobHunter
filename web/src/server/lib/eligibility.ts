@@ -282,7 +282,7 @@ export const zoneLabel = (z: string) => ZONE_LABEL[z] ?? z;
 
 export function verdictFor(
   e: Eligibility,
-  viewer: { country: string; timezone: string; shiftHours?: number },
+  viewer: { country: string; timezone: string; shiftHours?: number; authorizedIn?: string[] },
 ): Verdict {
   const c = viewer.country;
   const name = countryName(c);
@@ -293,7 +293,8 @@ export function verdictFor(
   if (SANCTIONED_COMPREHENSIVE.has(c)) return no(`Most employers can't hire in ${name} because of sanctions (not legal advice).`, null);
 
   for (const b of e.blockers) {
-    if (b.country === c) continue;
+    // Residents, citizens and permit holders of the named country clear the blocker.
+    if (b.country === c || viewer.authorizedIn?.includes(b.country)) continue;
     const where = countryName(b.country);
     const reason =
       b.kind === "citizenship" ? `Requires ${where} citizenship`

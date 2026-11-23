@@ -120,6 +120,8 @@ export function normCompany(c: string): string {
     .toLowerCase()
     .replace(/[.,]/g, " ")
     .replace(/\b(inc|llc|ltd|limited|gmbh|corp|corporation|co|company|sa|s a|bv|b v|plc|ag|pty|srl|oy|ab|as)\b/g, " ")
+    // Feed artefacts: "Backblaze External Website", "Acme Careers", "Acme Jobs"
+    .replace(/\b(external website|website|careers?|jobs|hiring|recruiting|talent)\b/g, " ")
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim()
     .replace(/\s+/g, " ");

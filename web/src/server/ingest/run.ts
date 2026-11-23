@@ -172,6 +172,9 @@ export async function runSource(adapter: SourceAdapter, log: (m: string) => void
     await db.update(postings).set({ closedAt: new Date() }).where(and(lt(postings.expiresAt, new Date()), isNull(postings.closedAt)));
     s.closed = await refreshJobStatuses();
     s.ok = true;
+    // Keep the owner's matches current with the new jobs (no-op without a profile).
+    const { recomputeMatches } = await import("../matching");
+    await recomputeMatches().then((n) => n && ctx.log(`matches recomputed: ${n}`)).catch((e) => ctx.log(`match recompute failed: ${(e as Error).message}`));
   } catch (e) {
     s.error = (e as Error).message;
     ctx.log(`failed: ${s.error}`);

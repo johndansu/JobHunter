@@ -5,13 +5,18 @@ import {
   index,
   integer,
   jsonb,
+  real,
   pgTable,
   serial,
   text,
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import type { CvParse } from "../lib/cv";
 import type { Eligibility } from "../lib/eligibility";
+import type { Checklist } from "../lib/match";
+import type { Profile } from "../lib/profile";
+import type { Requirements } from "../lib/requirements";
 import type { TrustLabel } from "../lib/trust";
 
 const tsvector = customType<{ data: string }>({
@@ -91,6 +96,7 @@ export const jobs = pgTable(
     expiresAt: tz("expires_at"),
     closedAt: tz("closed_at"),
     status: text("status").notNull().default("live"), // live|closed
+    requirements: jsonb("requirements").$type<Requirements>(), // RANK-01, extracted at ingest
     repostCount: integer("repost_count").notNull().default(0), // same source re-posted the role under a new id
     reopenedAt: tz("reopened_at"), // came back >14 days after a confirmed closure
     search: tsvector("search").generatedAlwaysAs(
@@ -156,6 +162,39 @@ export const boardProbes = pgTable("board_probes", {
   nameKey: text("name_key").primaryKey(),
   triedAt: tz("tried_at").notNull().defaultNow(),
   found: boolean("found").notNull().default(false),
+});
+
+/** The owner's private profile (single row, id = 1). Versioned so matches know what they were computed from. */
+export const profiles = pgTable("profiles", {
+  id: integer("id").primaryKey(),
+  version: integer("version").notNull().default(1),
+  data: jsonb("data").$type<Profile>().notNull(),
+  cv: jsonb("cv").$type<(CvParse & { fileName: string; uploadedAt: string; text: string }) | null>(),
+  updatedAt: tz("updated_at").notNull().defaultNow(),
+});
+
+/** Scored matches for the current profile (recomputed after profile edits and ingest runs). */
+export const matches = pgTable(
+  "matches",
+  {
+    jobId: integer("job_id").primaryKey(),
+    profileVersion: integer("profile_version").notNull(),
+    fit: real("fit").notNull(),
+    band: text("band").notNull(), // strong|good|stretch|unlikely
+    bandScore: real("band_score").notNull(),
+    halfLife: integer("half_life").notNull(),
+    verdict: text("verdict").notNull(), // for the profile's country/time zone/shift
+    verdictReason: text("verdict_reason"),
+    checklist: jsonb("checklist").$type<Checklist>().notNull(),
+    computedAt: tz("computed_at").notNull().defaultNow(),
+  },
+  (t) => [index("matches_band_idx").on(t.band), index("matches_verdict_idx").on(t.verdict)],
+);
+
+/** Jobs the owner said "not interested" to. */
+export const dismissals = pgTable("dismissals", {
+  jobId: integer("job_id").primaryKey(),
+  createdAt: tz("created_at").notNull().defaultNow(),
 });
 
 export type Job = typeof jobs.$inferSelect;

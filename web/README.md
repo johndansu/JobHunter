@@ -39,4 +39,13 @@ No scraping. Requests send `USER_AGENT` (default `JobHunter/2.0`) and no persona
 - **Closed jobs**: missing from two consecutive successful board fetches, a 404/410 on re-check, or past expiry. Timeouts and server errors never close a job.
 - **Trust labels** (`trust.ts`): facts only ("Open 74 days", "Employer says: talent pool"). "Possible scam" only on hard triggers with the quote, ignoring employers' own anti-fraud warnings.
 
+## Your matches (Phase 2, no-AI mode)
+
+1. **Profile** (`/profile`): upload a CV (PDF, .docx or text). Rules read your roles, dates, skills and languages, each with the CV line they came from (`src/server/lib/cv.ts`), and pre-fill a form you confirm. It also holds what only you can say: target roles, country, time zone, hours you'd shift, citizenships and permits.
+2. **Requirements**: every job gets a requirement record at ingest (`requirements.ts`). Skills come from a curated all-category dictionary (`skills.ts`) and are classed must / nice by section and wording, plus years, languages (including ones named in the title) and degree.
+3. **Matching** (`match.ts`, `src/server/matching.ts`): title similarity, must-have coverage, seniority and years, shown as **Strong / Good / Stretch** bands with a quoted "why" checklist, never a percentage. Ranking multiplies the band by freshness with a floor. Matches recompute after you save your profile and after every ingest run.
+4. **Pages**: `/matches` (with "New since yesterday"), `/why-not` (good-fit jobs closed to you, grouped by the rule that shuts you out, with how many open if you shift your hours), and a "Why this match" panel on each job.
+
+AI is optional (decision D-16): set `AI_MODE=on` and an API key once AI features ship; until then everything runs on rules on your machine, and your CV isn't sent anywhere. After changing matching rules, run `npm run backfill:requirements`.
+
 Design decisions live in `docs/v2-decisions.md` (kept out of git).

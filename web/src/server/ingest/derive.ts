@@ -1,6 +1,7 @@
 import { buildEligibility, verdictFor, type Eligibility, type Verdict } from "../lib/eligibility";
 import { categorize, cleanTitle, employmentTypeOf, engagementOf, languageOf, seniorityOf } from "../lib/normalize";
 import { cleanHtml, htmlToText } from "../lib/text";
+import { extractRequirements, type Requirements } from "../lib/requirements";
 import { trustLabels, type TrustLabel } from "../lib/trust";
 import { isEmployerSource, sourceById } from "../sources";
 import type { RawPosting } from "../sources/types";
@@ -30,6 +31,7 @@ export type Derived = {
   eligibility: Eligibility;
   verdict: Verdict;
   trust: TrustLabel[];
+  requirements: Requirements;
 };
 
 /** Everything the job card needs, computed from one source posting. */
@@ -65,6 +67,7 @@ export function derive(p: RawPosting): Derived {
     salaryPeriod: p.salary?.period ?? null,
     eligibility,
     verdict: verdictFor(eligibility, DEFAULT_VIEWER),
+    requirements: extractRequirements(title, descriptionText),
     trust: trustLabels({
       text: descriptionText,
       isEmployerAts: isEmployerSource(p.sourceId),
@@ -93,6 +96,7 @@ export function jobColumns(d: Derived) {
     salaryPeriod: d.salaryPeriod,
     eligibility: d.eligibility,
     trust: d.trust,
+    requirements: d.requirements,
     verdict: d.verdict.verdict,
     verdictReason: d.verdict.reason,
     verdictQuote: d.verdict.quote,

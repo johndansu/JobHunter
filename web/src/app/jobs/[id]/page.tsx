@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { OverlapText, TrustChips, VerdictBadge, daysOpen, timeAgo } from "@/components/bits";
+import { dismissAction } from "@/app/actions";
+import { ChecklistView } from "@/components/ChecklistView";
+import { BandBadge, OverlapText, TrustChips, VerdictBadge, daysOpen, timeAgo } from "@/components/bits";
+import { matchFor } from "@/server/matchQueries";
 import { DEFAULT_VIEWER } from "@/server/ingest/derive";
 import { verdictFor } from "@/server/lib/eligibility";
 import { countryName, REGIONS } from "@/server/lib/geo";
@@ -26,7 +29,7 @@ async function JobDetail({ params, searchParams }: Props) {
   const data = await getJob(Number(id));
   if (!data) notFound();
   const { job, posts } = data;
-  const lastChecked = await checkLiveness(job.id, job.lastChecked);
+  const [lastChecked, match] = await Promise.all([checkLiveness(job.id, job.lastChecked), matchFor(job.id)]);
   const country = (typeof sp.country === "string" ? sp.country : DEFAULT_VIEWER.country).toUpperCase();
   const viewer = { country, timezone: country === DEFAULT_VIEWER.country ? DEFAULT_VIEWER.timezone : "UTC", shiftHours: DEFAULT_VIEWER.shiftHours };
   const v = verdictFor(job.eligibility, viewer);
@@ -59,6 +62,20 @@ async function JobDetail({ params, searchParams }: Props) {
       </div>
 
       <aside className="space-y-4">
+        {match ? (
+          <div className="rounded-lg border border-line bg-surface p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-medium">Why this match</span>
+              <BandBadge band={match.band} />
+            </div>
+            <ChecklistView c={match.checklist} />
+            <form action={dismissAction} className="mt-3">
+              <input type="hidden" name="jobId" value={job.id} />
+              <input type="hidden" name="back" value="/matches" />
+              <button className="text-xs text-muted underline">Not interested</button>
+            </form>
+          </div>
+        ) : null}
         <div className="rounded-lg border border-line bg-surface p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">From {countryName(country)}</span>
