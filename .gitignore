@@ -16,6 +16,12 @@ build/
 .env.production.local
 # Note: .env.example is NOT ignored - Railway needs it
 
+# Local tool credentials (Baseline CLI stores access/refresh tokens here)
+.baseline/secrets.json
+
+# JobHunter mail credential key (created by the app when MAIL_SECRET_KEY is unset)
+.secrets/
+
 # Logs
 logs
 *.log
@@ -133,3 +139,7 @@ README-FIND-USERS.md
 
 # TestSprite generated tests
 testsprite_tests/
+# Private planning docs (kept locally, not in source control)
+docs/
+reports/
+research_notes/

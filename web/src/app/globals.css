@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f7f8f8;
+  --surface: #ffffff;
+  --ink: #14181b;
+  --muted: #5b6670;
+  --line: #e2e6e9;
+  --accent: #0f766e;
+  --accent-soft: #e6f4f2;
+  --good: #15803d;
+  --good-soft: #e8f6ec;
+  --warn: #a16207;
+  --warn-soft: #fdf5e1;
+  --bad: #b91c1c;
+  --bad-soft: #fdeceb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1214;
+    --surface: #161b1e;
+    --ink: #e7ecee;
+    --muted: #9aa6ae;
+    --line: #283035;
+    --accent: #2dd4bf;
+    --accent-soft: #10302d;
+    --good: #4ade80;
+    --good-soft: #12301c;
+    --warn: #facc15;
+    --warn-soft: #332a0c;
+    --bad: #f87171;
+    --bad-soft: #3a1515;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  overflow-wrap: break-word;
+}
+
+/* Employer HTML can carry long URLs, wide tables, images and fixed widths: keep it inside the screen. */
+.prose-job {
+  overflow-wrap: anywhere;
+}
+.prose-job img,
+.prose-job video,
+.prose-job iframe {
+  max-width: 100%;
+  height: auto;
+}
+.prose-job table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.prose-job pre {
+  white-space: pre-wrap;
+}
+.prose-job * {
+  max-width: 100%;
+}
+
+.prose-job p,
+.prose-job ul,
+.prose-job ol {
+  margin: 0.6em 0;
+}
+.prose-job ul {
+  list-style: disc;
+  padding-left: 1.3em;
+}
+.prose-job ol {
+  list-style: decimal;
+  padding-left: 1.3em;
+}
+.prose-job h2,
+.prose-job h3,
+.prose-job h4 {
+  font-weight: 600;
+  margin: 1em 0 0.4em;
+}
+.prose-job a {
+  color: var(--accent);
+  text-decoration: underline;
+}

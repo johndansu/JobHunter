@@ -1,0 +1,2211 @@
+{
+ "about": "Real location labels from Greenhouse, Lever, Ashby, Jobicy and Remote OK (sampled 2026-11-22), with reviewed parses for a viewer in Nigeria.",
+ "cases": [
+  {
+   "label": "Remote - USA",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "USA",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Home based - Worldwide",
+   "scope": "worldwide",
+   "places": [],
+   "verdict": "eligible"
+  },
+  {
+   "label": "Remote, United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Distributed",
+   "scope": "unknown",
+   "places": [],
+   "verdict": "unclear"
+  },
+  {
+   "label": "United States - Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United States (Remote)",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote",
+   "scope": "unknown",
+   "places": [],
+   "verdict": "unclear"
+  },
+  {
+   "label": "US Only",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - US",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote (United States | Canada)",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Canada; Remote, United States",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Canada - Remote (ON, AB, BC, or NS Only)",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "UK",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote U.S.",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Global",
+   "scope": "worldwide",
+   "places": [],
+   "verdict": "eligible"
+  },
+  {
+   "label": "Europe",
+   "scope": "restricted",
+   "places": [
+    "EUROPE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - India",
+   "scope": "restricted",
+   "places": [
+    "IN"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Germany",
+   "scope": "restricted",
+   "places": [
+    "DE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Germany",
+   "scope": "restricted",
+   "places": [
+    "DE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "North America",
+   "scope": "restricted",
+   "places": [
+    "NORTH_AMERICA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Canada,  USA",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Brazil",
+   "scope": "restricted",
+   "places": [
+    "BR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US - Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - US; Remote - Canada",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Canada (Remote)",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Canada",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Canada",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote US",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Singapore",
+   "scope": "restricted",
+   "places": [
+    "SG"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US-Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote UK",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Australia",
+   "scope": "restricted",
+   "places": [
+    "AU"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - US: Select locations",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Spain (Remote)",
+   "scope": "restricted",
+   "places": [
+    "ES"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Sweden (Remote)",
+   "scope": "restricted",
+   "places": [
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "LATAM",
+   "scope": "restricted",
+   "places": [
+    "LATAM"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, AMER",
+   "scope": "restricted",
+   "places": [
+    "AMERICAS"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United Kingdom (Remote)",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote France",
+   "scope": "restricted",
+   "places": [
+    "FR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Canada: Select locations",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Canada",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Germany (Remote)",
+   "scope": "restricted",
+   "places": [
+    "DE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - UK",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Worldwide",
+   "scope": "worldwide",
+   "places": [],
+   "verdict": "eligible"
+  },
+  {
+   "label": "Remote - Ireland",
+   "scope": "restricted",
+   "places": [
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Singapore",
+   "scope": "restricted",
+   "places": [
+    "SG"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Colombia",
+   "scope": "restricted",
+   "places": [
+    "CO"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Mexico",
+   "scope": "restricted",
+   "places": [
+    "MX"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Canada",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Republic of Ireland (Remote)",
+   "scope": "restricted",
+   "places": [
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote in the United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Mexico",
+   "scope": "restricted",
+   "places": [
+    "MX"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Japan",
+   "scope": "restricted",
+   "places": [
+    "JP"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Belgium",
+   "scope": "restricted",
+   "places": [
+    "BE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "New York, NY; New York, NY",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Spain",
+   "scope": "restricted",
+   "places": [
+    "ES"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Finland",
+   "scope": "restricted",
+   "places": [
+    "FI"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Netherlands",
+   "scope": "restricted",
+   "places": [
+    "NL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Sweden",
+   "scope": "restricted",
+   "places": [
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "France",
+   "scope": "restricted",
+   "places": [
+    "FR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Montréal - Remote; Québec - Remote",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote (US); Remote (Canada); San Francisco, CA; New York, NY (HQ); Toronto, ON; Miami, FL",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Argentina",
+   "scope": "restricted",
+   "places": [
+    "AR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "EMEA",
+   "scope": "restricted",
+   "places": [
+    "EMEA"
+   ],
+   "verdict": "region_match"
+  },
+  {
+   "label": "California, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Distributed; Hybrid",
+   "scope": "unknown",
+   "places": [],
+   "verdict": "unclear"
+  },
+  {
+   "label": "Remote, Japan",
+   "scope": "restricted",
+   "places": [
+    "JP"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote (US)",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, India",
+   "scope": "restricted",
+   "places": [
+    "IN"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Australia,  New Zealand",
+   "scope": "restricted",
+   "places": [
+    "AU",
+    "NZ"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Singapore",
+   "scope": "restricted",
+   "places": [
+    "SG"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - USA, CAN, MEX",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "MX",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "South Korea",
+   "scope": "restricted",
+   "places": [
+    "KR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Ireland,  UK",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "APAC",
+   "scope": "restricted",
+   "places": [
+    "APAC"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Ontario, Canada",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "San Francisco Bay Area or Remote (U.S.)",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Australia",
+   "scope": "restricted",
+   "places": [
+    "AU"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "London; London; Stockholm",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, France",
+   "scope": "restricted",
+   "places": [
+    "FR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "New York, NY",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Poland",
+   "scope": "restricted",
+   "places": [
+    "PL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Brazil",
+   "scope": "restricted",
+   "places": [
+    "BR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Australia; Remote, Singapore",
+   "scope": "restricted",
+   "places": [
+    "AU",
+    "SG"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Australia",
+   "scope": "restricted",
+   "places": [
+    "AU"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "NAMER",
+   "scope": "restricted",
+   "places": [
+    "NORTH_AMERICA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Texas, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Singapore; Australia",
+   "scope": "restricted",
+   "places": [
+    "AU",
+    "SG"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Netherlands",
+   "scope": "restricted",
+   "places": [
+    "NL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Brazil",
+   "scope": "restricted",
+   "places": [
+    "BR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Europe,  USA",
+   "scope": "restricted",
+   "places": [
+    "EUROPE",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US - Remote; New York City; Seattle; San Francisco",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Philippines",
+   "scope": "restricted",
+   "places": [
+    "PH"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Poland",
+   "scope": "restricted",
+   "places": [
+    "PL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Ireland",
+   "scope": "restricted",
+   "places": [
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Chicago, Atlanta, US-Remote, Toro",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Spain",
+   "scope": "restricted",
+   "places": [
+    "ES"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Hyderabad; Hyderabad",
+   "scope": "restricted",
+   "places": [
+    "IN"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "NYC, Remote; San Francisco, California",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United Kingdom; Manchester; Oxford; London; Cambridge",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - European Union; United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "EU",
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "San Francisco, New York, Seattle, Chicago, Atlanta, Remote in the US",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote (US); San Francisco, CA; New York, NY (HQ)",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Poland",
+   "scope": "restricted",
+   "places": [
+    "PL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Japan",
+   "scope": "restricted",
+   "places": [
+    "JP"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Canada - Remote; Toronto - Remote; Ontario - Remote; Alberta - Remote",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, South Korea",
+   "scope": "restricted",
+   "places": [
+    "KR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, San Francisco, CA, US",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, US",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Belgium",
+   "scope": "restricted",
+   "places": [
+    "BE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "California, USA, Remote; Colorado, USA, Remote; Washington, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote U.S.; Remote - Canada",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "UK,  USA",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United States; United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Austria",
+   "scope": "restricted",
+   "places": [
+    "AT"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, APAC",
+   "scope": "restricted",
+   "places": [
+    "APAC"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, North America",
+   "scope": "restricted",
+   "places": [
+    "NORTH_AMERICA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote US ",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "UK Only",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Germany",
+   "scope": "restricted",
+   "places": [
+    "DE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - UAE",
+   "scope": "restricted",
+   "places": [
+    "AE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "London, UK",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "New York, NY (HQ); San Francisco, CA; Remote (US)",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Australia: Select locations",
+   "scope": "restricted",
+   "places": [
+    "AU"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - The Netherlands",
+   "scope": "restricted",
+   "places": [
+    "NL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US - Remote; Miami - Remote; New York - Remote; New Jersey - Remote; Austin - Remote; Boston - Remote; Dallas - Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Seattle, WA; Seattle, WA",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "District of Columbia, USA, Remote; Maryland, USA, Remote; Virginia, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Germany; Austria",
+   "scope": "restricted",
+   "places": [
+    "AT",
+    "DE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote in the US",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Thailand",
+   "scope": "restricted",
+   "places": [
+    "TH"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "North America; Europe",
+   "scope": "restricted",
+   "places": [
+    "EUROPE",
+    "NORTH_AMERICA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "SF, NYC, CHI, US-Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United Kingdom; Cardiff; Birmingham; Bristol; Manchester; Leeds; Oxford; London; Cambridge; Glasgow; Edinburgh; Belfast",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Hungary",
+   "scope": "restricted",
+   "places": [
+    "HU"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Canada; Remote, United Kingdom; Remote, United States",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "GB",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Asia",
+   "scope": "restricted",
+   "places": [
+    "ASIA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Canada Only",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Stockholm; Stockholm; London",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Poland; Remote, United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "PL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Atlanta, GA - Hybrid; Denver, CO - Hybrid; New York, NY - Hybrid; San Francisco, CA - Hybrid; Scottsdale, AZ - Hybrid; Toronto, Ontario - Remote",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Portugal; Spain; Italy; Switzerland; Croatia; Ireland; Stockholm; Romania; Barcelona; Berlin; Sweden; Estonia",
+   "scope": "restricted",
+   "places": [
+    "CH",
+    "DE",
+    "EE",
+    "ES",
+    "HR",
+    "IE",
+    "IT",
+    "PT",
+    "RO",
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Ireland; Remote, France; Remote, Germany; Remote, Spain; Remote, United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "DE",
+    "ES",
+    "FR",
+    "GB",
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "London",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Australia; Singapore; South Korea; Philippines; Japan",
+   "scope": "restricted",
+   "places": [
+    "AU",
+    "JP",
+    "KR",
+    "PH",
+    "SG"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United Kingdom, Remote",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote-USA",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "New York, NY; New York, NY; Boston, MA",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "California Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Luxembourg",
+   "scope": "restricted",
+   "places": [
+    "LU"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "SF, NYC, Seattle, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, USA",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "New York, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Ireland; Remote, United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "New York, United States; Florida, United States; Massachusetts, United States; Virginia, United States; New Jersey, United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote (US); Remote (Canada); San Francisco, CA; New York, NY (HQ)",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Netherlands (Remote)",
+   "scope": "restricted",
+   "places": [
+    "NL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - European Union; United Kingdom; Belgium; Germany; Hamburg; Ireland; Spain; Netherlands; Portugal; France",
+   "scope": "restricted",
+   "places": [
+    "BE",
+    "DE",
+    "ES",
+    "EU",
+    "FR",
+    "GB",
+    "IE",
+    "NL",
+    "PT"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - United States ",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Spain",
+   "scope": "restricted",
+   "places": [
+    "ES"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Chicago, Illinois; NYC, Remote; San Francisco, California",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - European Union; Spain; Italy; Switzerland; Croatia; Ireland; Stockholm; Romania; Barcelona; Portugal; Berlin; Sweden; Estonia",
+   "scope": "restricted",
+   "places": [
+    "CH",
+    "DE",
+    "EE",
+    "ES",
+    "EU",
+    "HR",
+    "IE",
+    "IT",
+    "PT",
+    "RO",
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "France (Remote)",
+   "scope": "restricted",
+   "places": [
+    "FR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Illinois, USA, Remote; Texas, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Canada; Remote, Israel; Remote, United Kingdom; Remote, United States",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "GB",
+    "IL",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "LATAM,  Canada,  USA",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "LATAM",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Cyprus",
+   "scope": "restricted",
+   "places": [
+    "CY"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "France,  Germany",
+   "scope": "restricted",
+   "places": [
+    "DE",
+    "FR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote in the United States or Canada (West Coast/PT)",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US Remote ",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - US; Austin; Boulder; Los Angeles; Portland; Atlanta; Salt Lake City; Boston; Seattle; New York; San Francisco; Denver; Ann Arbor; Chicago; Raleigh",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Austria; Remote, Germany",
+   "scope": "restricted",
+   "places": [
+    "AT",
+    "DE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United Kingdom; Ireland",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - US: All locations",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Florida, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Canada; Montreal; Vancouver; Toronto",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, USA ",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "France,  Germany,  Netherlands,  UK",
+   "scope": "restricted",
+   "places": [
+    "DE",
+    "FR",
+    "GB",
+    "NL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Denver, CO - Hybrid; New York, NY - Hybrid; San Francisco, CA - Hybrid; Toronto, Ontario - Remote",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote (U.S.)",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - European Union; Spain; Italy; Germany; Switzerland; Denmark; Norway; Croatia; Ireland; Stockholm; Romania; Austria; Barcelona; Netherlands; Portugal; France; Berlin; Sweden; Hungary; Estonia",
+   "scope": "restricted",
+   "places": [
+    "AT",
+    "CH",
+    "DE",
+    "DK",
+    "EE",
+    "ES",
+    "EU",
+    "FR",
+    "HR",
+    "HU",
+    "IE",
+    "IT",
+    "NL",
+    "NO",
+    "PT",
+    "RO",
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Japan (Remote)",
+   "scope": "restricted",
+   "places": [
+    "JP"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "NAMER; EMEA",
+   "scope": "restricted",
+   "places": [
+    "EMEA",
+    "NORTH_AMERICA"
+   ],
+   "verdict": "region_match"
+  },
+  {
+   "label": "Michigan, USA, Remote; Ohio, USA, Remote; Pennsylvania, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Washington, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Ontario, Canada (DNU)",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US-Remote; US-Chicago; US-Atlanta; CA-Toronto; CA-Remote",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Canada; Waterloo; Montreal; Calgary; Vancouver; Toronto; Edmonton",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote/Hybrid",
+   "scope": "unknown",
+   "places": [],
+   "verdict": "unclear"
+  },
+  {
+   "label": "EMEA; Toronto; Ireland; Portugal; United Kingdom; Spain",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "EMEA",
+    "ES",
+    "GB",
+    "IE",
+    "PT"
+   ],
+   "verdict": "region_match"
+  },
+  {
+   "label": "London, UK; Remote in Europe; Remote in Sweden",
+   "scope": "restricted",
+   "places": [
+    "EUROPE",
+    "GB",
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Florida, USA, Remote; North Carolina, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Boston; Austin; San Diego; Chicago; Charlotte; Denver; Atlanta; Philadelphia; Pittsburgh",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US - Remote; New York - Remote; Austin - Remote; Washington D.C. - Remote; California - Remote; Seattle - Remote; Chicago - Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "District of Columbia, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Chicago, Atlanta, US-Remote, Toronto ",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Ireland; United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Atlanta, GA - Hybrid; Denver, CO - Hybrid; New York, NY - Hybrid; San Francisco, CA - Hybrid; Toronto, Ontario - Remote",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US: SF, NYC, Seattle and Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Lithuania",
+   "scope": "restricted",
+   "places": [
+    "LT"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "United Kingdom; Belgium; Germany; Switzerland; Ireland; Austria; Spain; Stuttgart; Berlin",
+   "scope": "restricted",
+   "places": [
+    "AT",
+    "BE",
+    "CH",
+    "DE",
+    "ES",
+    "GB",
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "California, USA, Remote; New York, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Argentina,  Costa Rica,  Mexico",
+   "scope": "restricted",
+   "places": [
+    "AR",
+    "CR",
+    "MX"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "New York, United States; Los Angeles, California, United States; Boston, Massachusetts, United States; San Francisco, California, United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Chile, Remote",
+   "scope": "restricted",
+   "places": [
+    "CL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "São Paulo",
+   "scope": "restricted",
+   "places": [
+    "BR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Minnesota, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Canada; Remote, US",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Any Location",
+   "scope": "worldwide",
+   "places": [],
+   "verdict": "eligible"
+  },
+  {
+   "label": "France; European Union; United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "EU",
+    "FR",
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "San Francisco, Seattle, New York, US - Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Bulgaria,  Czechia,  Hungary,  Poland,  Ukraine",
+   "scope": "restricted",
+   "places": [
+    "BG",
+    "CZ",
+    "HU",
+    "PL",
+    "UA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, London UK",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "SF, SEA, NY, Remote-US",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "France,  UK",
+   "scope": "restricted",
+   "places": [
+    "FR",
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, KSA; Remote, UAE",
+   "scope": "restricted",
+   "places": [
+    "AE",
+    "SA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "San Francisco, Seattle, New York, Chicago, US-Remote ",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - US: San Francisco, CA",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "HQ; NAMER",
+   "scope": "restricted",
+   "places": [
+    "NORTH_AMERICA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - UK; London, UK",
+   "scope": "restricted",
+   "places": [
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Global; Portugal; Spain; Brazil; Colombia; Canada",
+   "scope": "restricted",
+   "places": [
+    "BR",
+    "CA",
+    "CO",
+    "ES",
+    "PT"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "San Francisco, CA; Remote (US); New York, NY (HQ)",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Australia; Singapore",
+   "scope": "restricted",
+   "places": [
+    "AU",
+    "SG"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Georgia, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Atlanta, GA - Hybrid; Austin, TX - Remote; Chicago, IL - Remote; Denver, CO - Hybrid; Los Angeles, CA - Remote; Miami, FL - Remote; New York, NY - Hybrid; San Francisco, CA - Hybrid; Seattle, WA - Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote in Germany; Remote in the UK",
+   "scope": "restricted",
+   "places": [
+    "DE",
+    "GB"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US-New York, US-Chicago, US-Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Massachusetts Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Ireland; Remote, Poland; Remote, United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "GB",
+    "IE",
+    "PL"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "North Carolina, USA, Remote; Tennessee, USA, Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Ontario - Remote; Toronto - Remote; Vancouver - Remote",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "California, United States; Washington, United States; Colorado, United States; Texas, United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote, Bay Area, CA, US; Remote, San Francisco, CA, US; Remote, AMER",
+   "scope": "restricted",
+   "places": [
+    "AMERICAS",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US-SF, US-NYC, US-Seattle, US-Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote (California, Washington, and Oregon Only)",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "New York, NY; New York, NY; Toronto",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Türkiye",
+   "scope": "restricted",
+   "places": [
+    "TR"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote or In-Office in San Francisco",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - US ",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Denmark, Remote; Sweden, Remote; The Netherlands, Remote; United Kingdom, Remote",
+   "scope": "restricted",
+   "places": [
+    "DK",
+    "GB",
+    "NL",
+    "SE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Hong Kong,  Singapore,  UAE,  UK",
+   "scope": "restricted",
+   "places": [
+    "AE",
+    "GB",
+    "HK",
+    "SG"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Ireland",
+   "scope": "restricted",
+   "places": [
+    "IE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US-SF, US-NY, US-Remote",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - Canada; Calgary; Vancouver; Toronto",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "APAC,  Europe,  UAE",
+   "scope": "restricted",
+   "places": [
+    "AE",
+    "APAC",
+    "EUROPE"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Ontario - Remote; Toronto - Remote; Victoria (Canada) - Remote; Alberta - Remote",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Ontario - Remote",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "San Francisco, Seattle, New York, Chicago, Remote in the US",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - British Columbia, Canada",
+   "scope": "restricted",
+   "places": [
+    "CA"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote - US; Austin; Atlanta; Waterloo; Boston; Remote - Canada; New York; Montreal; Ann Arbor; Toronto; Chicago; Raleigh",
+   "scope": "restricted",
+   "places": [
+    "CA",
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "US-Remote, US-Chicago, US-New York, US-San Francisco",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Remote Ireland; Remote, France; Remote, Germany; Remote, Italy; Remote, Spain; Remote, United Kingdom",
+   "scope": "restricted",
+   "places": [
+    "DE",
+    "ES",
+    "FR",
+    "GB",
+    "IE",
+    "IT"
+   ],
+   "verdict": "not_eligible"
+  },
+  {
+   "label": "Texas, United States; Colorado, United States",
+   "scope": "restricted",
+   "places": [
+    "US"
+   ],
+   "verdict": "not_eligible"
+  }
+ ]
+}
