@@ -19,6 +19,9 @@ build/
 # Local tool credentials (Baseline CLI stores access/refresh tokens here)
 .baseline/secrets.json
 
+# JobHunter mail credential key (created by the app when MAIL_SECRET_KEY is unset)
+.secrets/
+
 # Logs
 logs
 *.log

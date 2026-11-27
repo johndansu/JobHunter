@@ -26,7 +26,8 @@ async function Health() {
           {totals.map((t) => `${t.verdict.replace("_", " ")}: ${t.n.toLocaleString()}`).join(" · ")} (for the default country)
         </p>
       </div>
-      <table className="w-full overflow-hidden rounded-lg border border-line bg-surface text-sm">
+      <div className="overflow-x-auto rounded-lg border border-line bg-surface">
+      <table className="w-full min-w-[560px] text-sm">
         <thead className="bg-bg text-left text-muted">
           <tr><th className="p-2">Source</th><th className="p-2">Open postings</th><th className="p-2">Closed</th><th className="p-2">Last run</th><th className="p-2">Status</th><th className="p-2" /></tr>
         </thead>
@@ -49,9 +50,11 @@ async function Health() {
           })}
         </tbody>
       </table>
+      </div>
       <div>
         <h2 className="mb-2 font-medium">Recent runs</h2>
-        <table className="w-full rounded-lg border border-line bg-surface text-xs">
+        <div className="overflow-x-auto rounded-lg border border-line bg-surface">
+        <table className="w-full min-w-[640px] text-xs">
           <thead className="bg-bg text-left text-muted"><tr><th className="p-2">Source</th><th className="p-2">Started</th><th className="p-2">Requests</th><th className="p-2">Fetched</th><th className="p-2">New</th><th className="p-2">Updated</th><th className="p-2">Closed</th><th className="p-2">Skipped (not remote)</th><th className="p-2">Result</th></tr></thead>
           <tbody>
             {recent.map((r) => (
@@ -63,6 +66,7 @@ async function Health() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

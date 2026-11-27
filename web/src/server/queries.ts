@@ -74,7 +74,8 @@ export async function searchJobs(p: SearchParams) {
       verdictNote: jobs.verdictNote, overlap: jobs.overlap, canonicalSource: jobs.canonicalSource,
       posted: postedExpr, firstSeen: jobs.firstSeen, lastSeen: jobs.lastSeen,
       repostCount: jobs.repostCount, reopenedAt: jobs.reopenedAt,
-      sourceCount: sql<number>`(select count(*)::int from postings p where p.job_id = ${jobs.id} and p.closed_at is null)`,
+      // Written as "jobs"."id" on purpose: drizzle renders ${jobs.id} unqualified here, which would bind to p.id.
+      sourceCount: sql<number>`(select count(*)::int from postings p where p.job_id = "jobs"."id" and p.closed_at is null)`,
     })
     .from(jobs)
     .where(cond)

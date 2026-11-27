@@ -26,6 +26,13 @@ export async function saveProfile(data: Profile, cv?: (typeof profiles.$inferIns
   return version;
 }
 
+/** Store (or clear) the candidate's profile export for the consistency check. Needs a profile row. */
+export async function setOtherProfile(other: (typeof profiles.$inferInsert)["otherProfile"]) {
+  const current = await getProfile();
+  if (!current) await saveProfile(EMPTY_PROFILE);
+  await db.update(profiles).set({ otherProfile: other ?? null, updatedAt: new Date() }).where(eq(profiles.id, 1));
+}
+
 /** Eligibility viewer from the profile: country, time zone, shift, plus citizenships and unexpired permits. */
 export function viewerOf(p: Profile, extraShift = 0) {
   const today = new Date().toISOString().slice(0, 10);

@@ -160,6 +160,10 @@ const CONTEXT_ONLY: Record<string, RegExp> = {
   ATS: /\bATS\b/,
   JS: /\bJS\b/,
   VA: /\bVA\b/,
+  // "a fast-paced, agile environment" describes the company, not a method the candidate needs.
+  Agile: /\bagile (?:methodolog\w*|development|practices|principles|delivery|frameworks?|ceremonies|coach(?:ing)?|project management|software|sprints?|scrum|transformation)\b|\bagile\s*(?:\/|and|or|,)\s*(?:scrum|kanban)\b|\b(?:scrum|kanban)\s*(?:\/|and|or|,)\s*agile\b/i,
+  // "Health insurance plans, dental and vision" is a benefit; the skill is working in health insurance.
+  "Health insurance": /\bhealth insurance (?:claims|billing|industry|carriers?|payers?|operations|eligibility|verification|experience|knowledge|sales|products|policies)\b|\b(?:claims|billing|eligibility) (?:in|for) health insurance\b/i,
 };
 
 // Brand names that are also everyday words ("excel at", "express interest", "Spring 2025",
@@ -220,7 +224,8 @@ export function skillIndex(skill: string, sentence: string): number {
   if (!def) return -1;
   let best = -1;
   for (const p of def.patterns) {
-    const m = new RegExp(p.source, p.flags.replace("g", "")).exec(sentence);
+    // Patterns carry no "g" flag, so exec is stateless; reusing them keeps V8's compiled code.
+    const m = p.exec(sentence);
     if (m && (best < 0 || m.index < best)) best = m.index;
   }
   return best;
@@ -231,7 +236,9 @@ export function canonicalSkill(raw: string): string {
   const t = raw.trim();
   const direct = BY_LOWER.get(t.toLowerCase());
   if (direct) return direct.name;
-  const hit = SKILLS.find((s) => s.patterns.some((p) => p.test(t)) && t.length <= s.name.length + 12);
+  // Same cheap substring pre-check as findSkills: running all ~600 Unicode-aware patterns costs seconds.
+  const lower = t.toLowerCase();
+  const hit = SKILLS.find((s) => t.length <= s.name.length + 12 && matches(s, t, lower));
   return hit ? hit.name : t;
 }
 

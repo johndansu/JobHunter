@@ -27,9 +27,8 @@ async function Results({ searchParams }: { searchParams: SP }) {
     return `/?${u.toString()}`;
   };
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-      <aside>
+  const active = [p.q, p.category, p.posted, p.engagement, p.salary, p.direct, p.flagged, p.elig && p.elig !== "open" ? p.elig : null].filter(Boolean).length;
+  const filters = (
         <form className="space-y-4 rounded-lg border border-line bg-surface p-4 text-sm" action="/">
           <label className="block">
             <span className="mb-1 block font-medium">Search</span>
@@ -93,11 +92,25 @@ async function Results({ searchParams }: { searchParams: SP }) {
           ) : null}
           <button className="w-full rounded bg-accent px-3 py-2 font-medium text-white">Apply filters</button>
         </form>
+  );
+
+  return (
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_1fr] lg:gap-6">
+      <aside className="min-w-0">
+        {/* Phones: filters fold away so the jobs come first. */}
+        <details className="group lg:hidden">
+          <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-line bg-surface px-4 py-2.5 text-sm font-medium">
+            <span>Filters{active ? ` (${active} on)` : ""} · {countryName(res.viewer.country)}</span>
+            <span className="text-muted group-open:rotate-180">▾</span>
+          </summary>
+          <div className="mt-2">{filters}</div>
+        </details>
+        <div className="hidden lg:block">{filters}</div>
       </aside>
 
-      <section>
+      <section className="min-w-0">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-          <h1 className="text-xl font-semibold">
+          <h1 className="text-lg font-semibold sm:text-xl">
             {res.total.toLocaleString()} {p.elig === "all" ? "remote jobs" : `remote jobs open to ${countryName(res.viewer.country)}`}
             {!res.exactCount ? <span className="ml-2 text-sm font-normal text-muted">(approximate count)</span> : null}
           </h1>
@@ -116,7 +129,7 @@ async function Results({ searchParams }: { searchParams: SP }) {
               return (
                 <li key={j.id} className="rounded-lg border border-line bg-surface p-4 hover:border-accent">
                   <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
+                    <div className="min-w-0">
                       <Link href={`/jobs/${j.id}?country=${res.viewer.country}`} className="text-base font-semibold hover:text-accent">
                         {j.title}
                       </Link>

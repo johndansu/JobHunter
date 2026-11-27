@@ -55,6 +55,29 @@
 body {
   background: var(--bg);
   color: var(--ink);
+  overflow-wrap: break-word;
+}
+
+/* Employer HTML can carry long URLs, wide tables, images and fixed widths: keep it inside the screen. */
+.prose-job {
+  overflow-wrap: anywhere;
+}
+.prose-job img,
+.prose-job video,
+.prose-job iframe {
+  max-width: 100%;
+  height: auto;
+}
+.prose-job table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.prose-job pre {
+  white-space: pre-wrap;
+}
+.prose-job * {
+  max-width: 100%;
 }
 
 .prose-job p,

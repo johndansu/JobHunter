@@ -1,7 +1,7 @@
 # JobHunter v2 (web)
 
 Remote jobs in every category, filtered to the ones open to your country, with the evidence behind every verdict.
-Phase 1 of the v2 plan: jobs in, cleaned, de-duplicated, labelled and searchable.
+Phases 1–4 of the v2 plan: jobs in and searchable, matched to your CV, turned into checked, tailored applications, and sent from your own Gmail when the posting asks for email.
 
 ## Run it locally
 
@@ -45,6 +45,38 @@ No scraping. Requests send `USER_AGENT` (default `JobHunter/2.0`) and no persona
 2. **Requirements**: every job gets a requirement record at ingest (`requirements.ts`). Skills come from a curated all-category dictionary (`skills.ts`) and are classed must / nice by section and wording, plus years, languages (including ones named in the title) and degree.
 3. **Matching** (`match.ts`, `src/server/matching.ts`): title similarity, must-have coverage, seniority and years, shown as **Strong / Good / Stretch** bands with a quoted "why" checklist, never a percentage. Ranking multiplies the band by freshness with a floor. Matches recompute after you save your profile and after every ingest run.
 4. **Pages**: `/matches` (with "New since yesterday"), `/why-not` (good-fit jobs closed to you, grouped by the rule that shuts you out, with how many open if you shift your hours), and a "Why this match" panel on each job.
+
+## Applying (Phase 3, no-AI mode)
+
+Open a job and choose **Start application** (needs a CV on `/profile`). Each application at `/applications/[id]` has:
+
+1. **Pre-flight** (`src/server/applications.ts`, `lib/preflight.ts`): re-checks the job is open, reads the employer's Greenhouse form for knockout questions (residence, sponsorship, authorization), finds the employer's stated AI policy, shows Greenhouse's AI-screening notice and opt-out link (your choice is logged; never automatic), and spots postings that ask for applications by email.
+2. **Evidence**: every requirement against the CV line that proves it: met, partly, or not met.
+3. **Tailored CV and letter** (`lib/tailor.ts`): built only from your CV. Skills and bullets are re-ordered for the job; nothing is added. The letter is a template with one or two real proofs and `[blanks]` only you can fill. You edit both as plain text.
+4. **Checks** (`lib/checks.ts`): the fact lock blocks numbers, tools, titles, employers, dates and degrees that aren't in your CV, tools used before they existed, unfilled blanks and hidden characters. Warnings cover vague bullets and recruiters' tells (overused wording, inflated verbs, copied posting text, generic praise, mixed spelling), each with the reason. There's no "AI score" and no humanizer.
+5. **Read-back** (`lib/render.ts`): the PDF and Word files are generated from your text, then read back the way hiring software does (name, contact details, section order, titles and dates, every bullet, nothing hidden or extra).
+6. **Approve, then download**: downloads exist only for approved text that passes read-back; any edit resets approval. You submit the employer's form yourself.
+
+Also: a tracker (`/applications`) where "Applied" becomes "No response" after 28 days, with follow-up timing hints; a message checker (`/check-message`) for recruiter messages and offers (scam patterns, look-alike sender domains, whether the company has live jobs here); an identity-readiness checklist; and a consistency check (`lib/consistency.ts`) that compares your CV with your LinkedIn data export (name, titles, employers, dates, degrees) and checks the letter's sign-off and named employers against the CV. Sending email is Phase 4.
+
+## Sending from Gmail (Phase 4)
+
+Connect your Gmail in **Settings → Email** (`/settings/email`). Two ways (decision D-17):
+
+- **Your own Google sign-in (recommended):** a Google Cloud OAuth client you create with your own account, asking only to send (`gmail.send`). Put `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env`; the settings page walks you through it and shows the redirect URI to register.
+- **An app password (fallback):** SMTP to Gmail; needs 2-Step Verification.
+
+The credential is encrypted at rest (`src/server/secret.ts`; key from `MAIL_SECRET_KEY` or a generated, git-ignored `.secrets/mail.key`) and never logged or exported.
+
+How an email goes out (`src/server/outbox.ts`):
+
+1. **Draft:** for jobs that ask for applications by email, a short note from your CV with the approved CV attached, to the address the posting gives (subject from the posting if it names one). Same fact lock and authenticity checks as the letter, plus link rules.
+2. **Recipient rules** (`lib/recipients.ts`): the address must appear in the posting (or, for speculative applications, on the company's own careers page); guessed and third-party addresses are blocked; free-mail and look-alike domains need your explicit confirmation; the domain must receive mail; no duplicates.
+3. **Exact message:** the RFC 5322 message is built once (`lib/mime.ts`) and shown in full with its SHA-256. You approve those bytes; the worker re-checks the hash before sending. "Send a test to myself" sends the same message to you.
+4. **Caps and gaps** (`lib/sendPolicy.ts`): at most 25 emails per 24 hours, 2–5 minutes apart, from a queue you can cancel; speculative applications at most 3 a day and one per company per 90 days.
+5. **After sending:** the stage moves to Applied; a follow-up draft (same thread) appears after 7 business days and a final one 7 later, each needing your approval; "Got a reply" buttons set the stage and stop follow-ups. Optional reply detection reads only the headers of threads JobHunter sent (needs the `gmail.metadata` permission).
+
+Also: speculative applications (`/speculative`), a provider-health panel, the send log, export (JSON/CSV) and delete-all-data in Settings → Email. Set `MAIL_WORKER=off` to stop all sending.
 
 AI is optional (decision D-16): set `AI_MODE=on` and an API key once AI features ship; until then everything runs on rules on your machine, and your CV isn't sent anywhere. After changing matching rules, run `npm run backfill:requirements`.
 

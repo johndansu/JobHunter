@@ -13,11 +13,14 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import type { CvParse } from "../lib/cv";
+import type { OtherProfile } from "../lib/consistency";
 import type { Eligibility } from "../lib/eligibility";
 import type { Checklist } from "../lib/match";
 import type { Profile } from "../lib/profile";
 import type { Requirements } from "../lib/requirements";
 import type { TrustLabel } from "../lib/trust";
+import type { Evidence } from "../lib/tailor";
+import type { DocChecks, Preflight } from "../applications";
 
 const tsvector = customType<{ data: string }>({
   dataType() {
@@ -170,6 +173,8 @@ export const profiles = pgTable("profiles", {
   version: integer("version").notNull().default(1),
   data: jsonb("data").$type<Profile>().notNull(),
   cv: jsonb("cv").$type<(CvParse & { fileName: string; uploadedAt: string; text: string }) | null>(),
+  // The candidate's own profile export (e.g. LinkedIn data export) for the consistency check (DOC-13). Name, roles, education only.
+  otherProfile: jsonb("other_profile").$type<(OtherProfile & { uploadedAt: string }) | null>(),
   updatedAt: tz("updated_at").notNull().defaultNow(),
 });
 
@@ -197,5 +202,135 @@ export const dismissals = pgTable("dismissals", {
   createdAt: tz("created_at").notNull().defaultNow(),
 });
 
+/**
+ * One application per job (AFT-01). Stage history and the candidate's choices
+ * (e.g. AI opt-out, AUTH-08) go to application_events.
+ */
+export const applications = pgTable(
+  "applications",
+  {
+    id: serial("id").primaryKey(),
+    jobId: integer("job_id"), // null for speculative applications (no posting)
+    // Speculative applications (MAIL-19): the company, the role area, and the page that publishes the address.
+    specCompany: text("spec_company"),
+    specRole: text("spec_role"),
+    specDomain: text("spec_domain"),
+    specSourceUrl: text("spec_source_url"),
+    specSourceText: text("spec_source_text"),
+    // saved|applied|screening|interviewing|offer|accepted|declined|rejected|withdrawn|no_response
+    stage: text("stage").notNull().default("saved"),
+    stageAt: tz("stage_at").notNull().defaultNow(),
+    channel: text("channel").notNull().default("web_form"), // web_form|email|speculative
+    appliedAt: tz("applied_at"),
+    notes: text("notes").notNull().default(""),
+    preflight: jsonb("preflight").$type<Preflight>(),
+    evidence: jsonb("evidence").$type<Evidence[]>().notNull().default([]),
+    aiOptOut: text("ai_opt_out"), // null (not decided) | opted_out | stayed_in
+    createdAt: tz("created_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("applications_job_uq").on(t.jobId), index("applications_stage_idx").on(t.stage)],
+);
+
+/** The tailored documents for an application. One row per kind; edits bump the version and reset approval. */
+export const documents = pgTable(
+  "documents",
+  {
+    id: serial("id").primaryKey(),
+    applicationId: integer("application_id").notNull(),
+    kind: text("kind").notNull(), // cv|letter
+    version: integer("version").notNull().default(1),
+    content: text("content").notNull(),
+    generated: text("generated").notNull(), // the app's draft, before the candidate's edits
+    checks: jsonb("checks").$type<DocChecks>(),
+    approvedAt: tz("approved_at"),
+    approvedHash: text("approved_hash"),
+    updatedAt: tz("updated_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("documents_app_kind_uq").on(t.applicationId, t.kind)],
+);
+
+export const applicationEvents = pgTable(
+  "application_events",
+  {
+    id: serial("id").primaryKey(),
+    applicationId: integer("application_id").notNull(),
+    at: tz("at").notNull().defaultNow(),
+    kind: text("kind").notNull(), // created|stage|edit|approve|download|preflight|ai_opt_out|note
+    detail: text("detail").notNull().default(""),
+  },
+  (t) => [index("application_events_app_idx").on(t.applicationId)],
+);
+
+/** The connected Gmail account (single row, id = 1). The credential is encrypted at rest (MAIL-05). */
+export const mailAccount = pgTable("mail_account", {
+  id: integer("id").primaryKey(),
+  method: text("method").$type<"gmail_oauth" | "gmail_app_password">().notNull(),
+  email: text("email").notNull(),
+  name: text("name"),
+  secret: text("secret").notNull(), // encrypted refresh token or app password
+  scopes: text("scopes").notNull().default(""),
+  replyDetection: boolean("reply_detection").notNull().default(false),
+  connectedAt: tz("connected_at").notNull().defaultNow(),
+  lastOkAt: tz("last_ok_at"),
+  lastError: text("last_error"),
+  lastErrorAt: tz("last_error_at"),
+});
+
+/**
+ * Every email: draft → queued → sent (or failed/cancelled). The MIME message is
+ * built and hashed at approval; the worker sends only if the hash still matches
+ * (MAIL-07, MAIL-15).
+ */
+export const outbox = pgTable(
+  "outbox",
+  {
+    id: serial("id").primaryKey(),
+    applicationId: integer("application_id"), // null for a test to yourself
+    kind: text("kind").notNull(), // application | speculative | follow_up | test
+    status: text("status").notNull().default("draft"), // draft | queued | sending | sent | failed | cancelled
+    toAddr: text("to_addr").notNull().default(""),
+    toSource: jsonb("to_source").$type<{ kind: "posting" | "company_site" | "self" | "thread"; url: string | null; quote: string | null; capturedAt: string }>(),
+    overrides: jsonb("overrides").$type<string[]>().notNull().default([]),
+    subject: text("subject").notNull().default(""),
+    body: text("body").notNull().default(""),
+    attach: jsonb("attach").$type<{ cv: "pdf" | "docx" | null; letter: "pdf" | "docx" | null }>().notNull().default({ cv: "pdf", letter: null }),
+    mime: text("mime"),
+    mimeHash: text("mime_hash"),
+    cvHash: text("cv_hash"),
+    messageId: text("message_id"),
+    inReplyTo: text("in_reply_to"),
+    threadId: text("thread_id"), // Gmail thread id
+    providerId: text("provider_id"), // Gmail message id
+    approvedAt: tz("approved_at"),
+    sendAt: tz("send_at"),
+    sentAt: tz("sent_at"),
+    error: text("error"),
+    attempts: integer("attempts").notNull().default(0),
+    createdAt: tz("created_at").notNull().defaultNow(),
+    updatedAt: tz("updated_at").notNull().defaultNow(),
+  },
+  (t) => [index("outbox_app_idx").on(t.applicationId), index("outbox_status_idx").on(t.status)],
+);
+
+/** Replies noticed in threads JobHunter sent (MAIL-16): sender domain, time and a category only; never bodies. */
+export const replyEvents = pgTable(
+  "reply_events",
+  {
+    id: serial("id").primaryKey(),
+    applicationId: integer("application_id").notNull(),
+    outboxId: integer("outbox_id"),
+    providerMessageId: text("provider_message_id"),
+    at: tz("at").notNull().defaultNow(),
+    senderDomain: text("sender_domain"),
+    category: text("category").notNull(), // auto_reply | reply | interview | rejection | info | other
+    source: text("source").notNull().default("manual"), // manual | detected
+    status: text("status").notNull().default("proposed"), // proposed | confirmed | dismissed
+  },
+  (t) => [uniqueIndex("reply_events_msg_uq").on(t.providerMessageId), index("reply_events_app_idx").on(t.applicationId)],
+);
+
 export type Job = typeof jobs.$inferSelect;
+export type OutboxRow = typeof outbox.$inferSelect;
+export type Application = typeof applications.$inferSelect;
+export type DocRow = typeof documents.$inferSelect;
 export type Posting = typeof postings.$inferSelect;

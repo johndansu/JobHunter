@@ -49,7 +49,7 @@ async function Matches({ searchParams }: { searchParams: SP }) {
             Jobs open to you, scored against your profile. Strong {res.counts.strong ?? 0} · Good {res.counts.good ?? 0} · Stretch {res.counts.stretch ?? 0}. Fresher jobs rank higher.
           </p>
         </div>
-        <div className="flex gap-2 text-sm">
+        <div className="flex flex-wrap gap-2 text-sm">
           <Link className={tab(p.view !== "new")} href={href({ view: undefined, page: undefined })}>All matches</Link>
           <Link className={tab(p.view === "new")} href={href({ view: "new", page: undefined })}>New since yesterday{res.newStrongGood ? ` (${res.newStrongGood})` : ""}</Link>
         </div>
@@ -62,7 +62,7 @@ async function Matches({ searchParams }: { searchParams: SP }) {
           <option value="good">Strong + Good</option>
           <option value="stretch">Include stretches</option>
         </select>
-        <select name="category" defaultValue={p.category ?? ""} className="rounded border border-line bg-surface px-2 py-1.5">
+        <select name="category" defaultValue={p.category ?? ""} className="min-w-0 max-w-full rounded border border-line bg-surface px-2 py-1.5">
           <option value="">All categories</option>
           {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
         </select>
@@ -79,7 +79,7 @@ async function Matches({ searchParams }: { searchParams: SP }) {
             return (
               <li key={j.id} className="rounded-lg border border-line bg-surface p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
+                  <div className="min-w-0">
                     <Link href={`/jobs/${j.id}`} className="text-base font-semibold hover:text-accent">{j.title}</Link>
                     <div className="text-sm text-muted">{j.company} · {j.category}{j.employmentType ? ` · ${j.employmentType}` : ""}</div>
                   </div>

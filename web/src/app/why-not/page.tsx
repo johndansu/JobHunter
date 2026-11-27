@@ -41,7 +41,7 @@ async function WhyNot() {
       </div>
       {res.groups.map((g) => (
         <section key={g.name} className="rounded-lg border border-line bg-surface p-4">
-          <div className="flex items-baseline justify-between">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="font-medium">{g.name}</h2>
             <span className="text-sm text-muted">{g.count.toLocaleString()} jobs</span>
           </div>

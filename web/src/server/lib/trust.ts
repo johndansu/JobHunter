@@ -23,7 +23,7 @@ export type TrustLabel =
   | { kind: "employer_says"; text: string; quote: string }
   | { kind: "thin_description"; text: string };
 
-const HARD: [RegExp, string][] = [
+export const HARD: [RegExp, string][] = [
   [/\b(pay|paying|payment of|purchase|buy)\s+(?:an?\s+)?(registration|training|application|processing|starter|onboarding|equipment|visa|certification)\s+(fee|kit|package)s?\b|\bupfront (fee|payment|deposit)\b|\byou (must|will need to|are required to) (pay|purchase|buy)\b/i, "Asks you to pay"],
   // The applicant pays in crypto (not a crypto company describing its product).
   [/\b(you|your|applicants?|candidates?)\b[^.\n]{0,60}\b(deposit|pay|send|transfer|top[- ]?up|fund)\b[^.\n]{0,40}\b(usdt|bitcoin|btc|crypto(currency)?|ethereum|tether)\b|\b(deposit|top[- ]?up)\b[^.\n]{0,30}\b(usdt|bitcoin|btc|crypto(currency)?|tether)\b[^.\n]{0,50}\b(to (start|activate|unlock|begin|receive|withdraw|qualify))\b/i, "Asks you to pay in crypto"],
@@ -35,7 +35,7 @@ const HARD: [RegExp, string][] = [
   [/\b(send|provide|submit|share)\b[^.\n]{0,30}\b(copy of (your )?(passport|national id|id card|driver'?s licen[cs]e)|bank (account )?details|ssn|social security number|\bbvn\b|\bnin\b)\b[^.\n]{0,40}\b(before|to (apply|be considered|proceed|secure))\b/i, "Asks for ID or bank details before an offer"],
 ];
 
-const SOFT: [RegExp, string][] = [
+export const SOFT: [RegExp, string][] = [
   [/[a-z0-9._%+-]+@(gmail|yahoo|hotmail|outlook|aol|protonmail|proton|icloud|yandex|mail)\.(com|me|ru)\b/i, "Contact uses a free email address"],
   [/(\$|usd|£|€)\s?\d{3,5}\s*(per|\/|a)\s*(day|week)\b[^.\n]{0,80}\b(no experience|entry level|data entry|from home)\b|\b(no experience|data entry)\b[^.\n]{0,80}(\$|usd|£|€)\s?\d{3,5}\s*(per|\/|a)\s*(day|week)\b/i, "Pay looks too good for no-experience work"],
   [/\b(apply (immediately|asap|urgently)|limited (spots|slots)|immediate start|start today|hiring urgently)\b/i, "Urgency pressure"],

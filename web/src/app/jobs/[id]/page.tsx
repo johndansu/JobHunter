@@ -10,6 +10,8 @@ import { verdictFor } from "@/server/lib/eligibility";
 import { countryName, REGIONS } from "@/server/lib/geo";
 import { formatSalary } from "@/server/lib/salary";
 import { checkLiveness } from "@/server/liveness";
+import { STAGE_LABEL, applicationForJob, type Stage } from "@/server/applications";
+import { startApplicationAction } from "@/app/applications/actions";
 import { getJob, isEmployerSource } from "@/server/queries";
 import { sourceById } from "@/server/sources";
 
@@ -29,7 +31,7 @@ async function JobDetail({ params, searchParams }: Props) {
   const data = await getJob(Number(id));
   if (!data) notFound();
   const { job, posts } = data;
-  const [lastChecked, match] = await Promise.all([checkLiveness(job.id, job.lastChecked), matchFor(job.id)]);
+  const [lastChecked, match, application] = await Promise.all([checkLiveness(job.id, job.lastChecked), matchFor(job.id), applicationForJob(job.id)]);
   const country = (typeof sp.country === "string" ? sp.country : DEFAULT_VIEWER.country).toUpperCase();
   const viewer = { country, timezone: country === DEFAULT_VIEWER.country ? DEFAULT_VIEWER.timezone : "UTC", shiftHours: DEFAULT_VIEWER.shiftHours };
   const v = verdictFor(job.eligibility, viewer);
@@ -41,10 +43,10 @@ async function JobDetail({ params, searchParams }: Props) {
   const liveAsOf = lastChecked ?? job.lastSeen;
 
   return (
-    <article className="grid gap-6 lg:grid-cols-[1fr_300px]">
+    <article className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
       <div className="min-w-0">
         <Link href={`/?country=${country}`} className="text-sm text-muted hover:text-ink">← Back to jobs</Link>
-        <h1 className="mt-2 text-2xl font-semibold">{job.title}</h1>
+        <h1 className="mt-2 text-xl font-semibold sm:text-2xl">{job.title}</h1>
         <p className="text-muted">
           {job.company} · {job.category}
           {job.seniority ? ` · ${job.seniority}` : ""}
@@ -61,7 +63,19 @@ async function JobDetail({ params, searchParams }: Props) {
         <div className="prose-job mt-6 text-[15px] leading-relaxed" dangerouslySetInnerHTML={{ __html: job.descriptionHtml || "<p>No description provided.</p>" }} />
       </div>
 
-      <aside className="space-y-4">
+      <aside className="min-w-0 space-y-4">
+        {typeof sp.error === "string" ? <p className="rounded bg-bad-soft px-3 py-2 text-sm text-bad">{sp.error}</p> : null}
+        {application ? (
+          <Link href={`/applications/${application.id}`} className="block rounded-lg border border-accent/40 bg-accent-soft p-4 text-sm text-accent">
+            <span className="font-medium">Your application</span> · {STAGE_LABEL[application.stage as Stage]} →
+          </Link>
+        ) : job.status === "live" ? (
+          <form action={startApplicationAction} className="rounded-lg border border-line bg-surface p-4 text-sm">
+            <input type="hidden" name="jobId" value={job.id} />
+            <button className="w-full rounded border border-accent px-3 py-2 font-medium text-accent">Start application</button>
+            <p className="mt-2 text-xs text-muted">Checks the form for knockout questions, maps the requirements to your CV, and drafts a tailored CV and letter from your own CV only.</p>
+          </form>
+        ) : null}
         {match ? (
           <div className="rounded-lg border border-line bg-surface p-4">
             <div className="mb-2 flex items-center justify-between">

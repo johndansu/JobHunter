@@ -18,7 +18,9 @@ export type Requirements = {
 
 const MUST_HEAD = /^(requirements?|qualifications?|minimum qualifications|basic qualifications|required (skills|experience|qualifications)|what you('ll)? (need|bring|have)|what we('re)? looking for|must[- ]haves?|you (have|bring|are|will have)|about you|who you are|your (profile|skills|experience)|skills( and|\s*&)? experience|key skills|the ideal candidate)\b/i;
 const NICE_HEAD = /^(nice[- ]to[- ]haves?|bonus( points)?|preferred( qualifications| skills)?|pluses|extra credit|good to have|it('s| is| would be) (great|a plus|nice) if|additional (skills|qualifications)|desirable)\b/i;
-const OTHER_HEAD = /^(responsibilities|what you('ll)? do|the role|about the role|day[- ]to[- ]day|your (role|mission|impact)|benefits|perks|what we offer|about us|who we are|why (join|us))\b/i;
+const OTHER_HEAD = /^(responsibilities|what you('ll)? do|the role|about the role|day[- ]to[- ]day|your (role|mission|impact)|about us|who we are|why (join|us))\b/i;
+// Benefits sections list what the employer gives, never what the candidate needs ("Health insurance plans", "L&D budget").
+const BENEFIT_HEAD = /^((our )?benefits|perks|(our )?benefits( and|\s*&)? perks|perks( and|\s*&)? benefits|what we offer|we offer|our offer|what ([\p{L}\d&.'-]+ ){0,3}(offers?|provides?|gives?)( to)?( you)?|what you('ll)? get(\s+in return)?$|what's in it for you|why you'll love|compensation( and|\s*&)? benefits|total rewards|the perks)/iu;
 
 const NICE_WORDS = /\b(nice to have|preferred|is a plus|are a plus|a plus|bonus|ideally|desirable|advantageous|would be great|familiarity with|exposure to)\b/i;
 const MUST_WORDS = /\b(required|must|need(ed)?|requires?|proven|strong|solid|expert|proficien\w*|experience (with|in|using)|hands-on|deep knowledge|demonstrated|minimum)\b/i;
@@ -39,15 +41,17 @@ export function extractRequirements(title: string, text: string): Requirements {
   let years: Requirements["years"] = null;
   const languages: Requirements["languages"] = [];
   const rank = { must: 3, nice: 2, mentioned: 1 } as const;
-  let section: "must" | "nice" | "other" | "none" = "none";
+  let section: "must" | "nice" | "other" | "benefits" | "none" = "none";
 
   for (const line of lines) {
     const head = line.replace(/^[•\-*#\s]+/, "").replace(/[:：]\s*$/, "");
     if (head.length <= 60) {
+      if (BENEFIT_HEAD.test(head)) { section = "benefits"; continue; }
       if (NICE_HEAD.test(head)) { section = "nice"; continue; }
       if (MUST_HEAD.test(head)) { section = "must"; continue; }
       if (OTHER_HEAD.test(head)) { section = "other"; continue; }
     }
+    if (section === "benefits") continue;
     for (const s of sentences(line)) {
       const quote = s.length > 200 ? s.slice(0, 199) + "…" : s;
       // "…in customer support, ideally in SaaS": a nice-word only softens what comes after it.

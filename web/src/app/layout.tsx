@@ -16,20 +16,23 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         <header className="border-b border-line bg-surface">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
             <Link href="/" className="text-lg font-semibold tracking-tight">
               Job<span className="text-accent">Hunter</span>
             </Link>
-            <nav className="flex gap-5 text-sm text-muted">
+            <nav className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted lg:gap-x-5 [&>a]:whitespace-nowrap">
               <Link href="/" className="hover:text-ink">Jobs</Link>
               <Link href="/matches" className="hover:text-ink">My matches</Link>
               <Link href="/why-not" className="hover:text-ink">Why not me?</Link>
+              <Link href="/applications" className="hover:text-ink">Applications</Link>
+              <Link href="/check-message" className="hover:text-ink">Check a message</Link>
               <Link href="/profile" className="hover:text-ink">Profile</Link>
               <Link href="/sources" className="hover:text-ink">Sources</Link>
+              <Link href="/settings/email" className="hover:text-ink">Email</Link>
             </nav>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">{children}</main>
+        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 py-5 sm:py-6">{children}</main>
         <footer className="border-t border-line bg-surface">
           <div className="mx-auto max-w-6xl px-4 py-5 text-xs leading-relaxed text-muted">
             Jobs come from{" "}

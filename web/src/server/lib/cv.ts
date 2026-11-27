@@ -7,7 +7,8 @@ import { canonicalSkill, findSkills } from "./skills";
  * from (PROF-02), and dates/years are computed in code (PROF-03).
  */
 
-export type CvRole = { title: string; employer: string | null; start: string | null; end: string | null; current: boolean; months: number | null; quote: string; flags: string[] };
+export type CvRole = { title: string; employer: string | null; start: string | null; end: string | null; current: boolean; months: number | null; quote: string; flags: string[]; bullets: string[] };
+export type CvContact = { name: string | null; email: string | null; phone: string | null; location: string | null; links: string[] };
 export type CvParse = {
   roles: CvRole[];
   skills: { skill: string; quote: string }[];
@@ -16,6 +17,10 @@ export type CvParse = {
   totalYears: number | null;
   seniorityGuess: string | null;
   warnings: string[];
+  summary: string | null;
+  contact: CvContact;
+  /** Invisible characters or look-alike letters found in the file (DOC-06). */
+  hidden: string[];
 };
 
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
@@ -26,7 +31,7 @@ const RANGE_RE = new RegExp(`(${DATE})\\s*(?:-|–|—|to|until)\\s*(${DATE}|pre
 const SECTION_RE = /^(work experience|professional experience|experience|employment history|employment|career history|work history|education|academic background|qualifications|skills|technical skills|core skills|key skills|competencies|languages|certifications|certificates|summary|profile|professional summary|projects|volunteer(ing)?|references|awards|interests)\s*:?$/i;
 
 /** Parse "Mar 2021", "03/2021" or "2021" into a month index (months since year 0). */
-function toMonth(d: string, isEnd: boolean): number | null {
+export function toMonth(d: string, isEnd: boolean): number | null {
   const s = d.trim().toLowerCase();
   if (/^(present|current|now|date|ongoing)$/.test(s)) {
     const n = new Date();
@@ -86,6 +91,8 @@ export function parseCvText(raw: string): CvParse {
   const education: { text: string }[] = [];
   const languages: CvParse["languages"] = [];
   const explicitSkills: { skill: string; quote: string }[] = [];
+  const summary: string[] = [];
+  const bulletLine = new Map<number, { role: number; idx: number }>(); // line index -> where it was filed
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -109,6 +116,11 @@ export function parseCvText(raw: string): CvParse {
           quote = `${lines[i - 2]}\n${quote}`;
         }
       }
+      // Lines used as this role's title were filed as the previous role's bullets: take them back.
+      for (const back of [i - 1, i - 2]) {
+        const at = bulletLine.get(back);
+        if (at && quote.includes(lines[back])) roles[at.role].bullets[at.idx] = "";
+      }
       const { title, employer } = splitTitleEmployer(src || "Unknown role");
       const s = toMonth(start, false);
       const e = toMonth(end, true);
@@ -120,7 +132,7 @@ export function parseCvText(raw: string): CvParse {
         title, employer, start, end,
         current: /present|current|now|date|ongoing/i.test(end),
         months: s != null && e != null ? e - s + 1 : null,
-        quote, flags,
+        quote, flags, bullets: [],
       });
       continue;
     }
@@ -134,6 +146,16 @@ export function parseCvText(raw: string): CvParse {
         const level = LEVEL_WORDS.find(([re]) => re.test(after))?.[1] ?? null;
         if (!languages.some((l) => l.language === m[1])) languages.push({ language: m[1], level, quote: line });
       }
+      continue;
+    }
+    if (/summary|profile/.test(section)) {
+      summary.push(line);
+      continue;
+    }
+    if (roles.length && /experience|employment|work|career/.test(section)) {
+      const r = roles.length - 1;
+      bulletLine.set(i, { role: r, idx: roles[r].bullets.length });
+      roles[r].bullets.push(line.replace(/^[•\-*–▪●◦]\s*/, ""));
       continue;
     }
     if (/skill|competenc/.test(section) || /^(skills|tools|technologies)\s*:/i.test(line)) {
@@ -166,7 +188,52 @@ export function parseCvText(raw: string): CvParse {
   let seniorityGuess = latest ? seniorityOf(latest.title) : null;
   if (!seniorityGuess && years != null) seniorityGuess = years >= 8 ? "Senior" : years >= 3 ? "Mid" : "Junior";
 
-  return { roles, skills, education, languages, totalYears: years, seniorityGuess, warnings };
+  for (const r of roles) r.bullets = r.bullets.filter(Boolean);
+
+  const head = lines.slice(0, 6).join("  ");
+  const email = raw.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/)?.[0] ?? null;
+  const phone = head.match(/(\+?\d[\d\s\-().]{7,}\d)/)?.[1]?.trim() ?? null;
+  const links = [...new Set([...raw.matchAll(/\b(?:https?:\/\/)?(?:www\.)?(?:linkedin\.com\/in|github\.com|behance\.net|dribbble\.com)\/[A-Za-z0-9_\-/.]+/gi)].map((m) => m[0]))];
+  const first = lines[0] ?? "";
+  const name = /^[\p{L}'.\- ]{3,60}$/u.test(first) && first.split(" ").length <= 5 && !SECTION_RE.test(first) ? first : null;
+  const location = lines.slice(1, 4).map((l) => l.split(/[·|•]/)[0].trim()).find((l) => /^[\p{L} .'-]+,\s*[\p{L} .'-]+$/u.test(l)) ?? null;
+
+  // Hidden content an applicant may not know their template carries (DOC-06).
+  const hidden = hiddenContent(raw);
+
+  return {
+    roles, skills, education, languages, totalYears: years, seniorityGuess, warnings,
+    summary: summary.length ? summary.join(" ") : null,
+    contact: { name, email, phone, location, links },
+    hidden,
+  };
+}
+
+/** Fill fields added after a CV was first stored (bullets, summary, contact, hidden). */
+export function withCvDefaults<T extends Partial<CvParse>>(cv: T): T & CvParse {
+  return {
+    ...cv,
+    roles: (cv.roles ?? []).map((r) => ({ ...r, bullets: r.bullets ?? [] })),
+    skills: cv.skills ?? [],
+    education: cv.education ?? [],
+    languages: cv.languages ?? [],
+    totalYears: cv.totalYears ?? null,
+    seniorityGuess: cv.seniorityGuess ?? null,
+    warnings: cv.warnings ?? [],
+    summary: cv.summary ?? null,
+    contact: cv.contact ?? { name: null, email: null, phone: null, location: null, links: [] },
+    hidden: cv.hidden ?? [],
+  };
+}
+
+/** Invisible characters and look-alike letters (DOC-06). Used on uploaded CVs and on generated documents. */
+export function hiddenContent(raw: string): string[] {
+  const out: string[] = [];
+  const zw = raw.match(/[​-‍⁠﻿­]/g);
+  if (zw) out.push(`${zw.length} invisible character(s) (zero-width or soft hyphen)`);
+  if (/[A-Za-z][Ѐ-ӿ]|[Ѐ-ӿ][A-Za-z]/.test(raw)) out.push("Cyrillic look-alike letters mixed into English words");
+  if (/[‪-‮⁦-⁩]/.test(raw)) out.push("text-direction control characters");
+  return out;
 }
 
 /** Plain text from an uploaded CV. PDF via unpdf, Word via mammoth, otherwise UTF-8 text. */
